@@ -3,7 +3,15 @@
 ![alt tag](https://github.com/atomiton/TiESVHack-SmartParking/blob/master/Smart_Parking.png)
 ## Application Flow
 ![alt tag](https://github.com/atomiton/TiESVHack-SmartParking/blob/master/Smart_Parking_Fig.png)
-
+##How it works?
+A developer plays a role of a Parking lot operator. Who sets day price before 8 a.m. every day and keeps posting the information about his parking lots to CityParkingApp and OperatorApp. This information includes Vacancy, Hourly rate, etc.
+Operator is also able to send private information to the drivers who has adopted OperatorApp.
+When an operator gets a request for parking from drivers he reserves a parking slot in the requested lot.
+App keeps posting the parking lot information to CityParkingApp and Operator app at particular interval.  This information is further passed on to drivers which turns out with the maximum reach to drivers and attracting more reservations. Operator can also send information manually.
+Parking spot occupancy is displayed on the UI. Application gets occupancy updates through subscription to Spot occupancy status.
+Operator's total revenue, Day revenue and the Loyalty credit is displayed on UI.
+Operator can also track the drivers and other parking lots on the map.
+Reports can be generated with the components like Revenue, Parking spot reservations against time with the help of charts in the Reports section.
 ###Clone repository
 #####git clone https://github.com/atomiton/TiESVHack-SmartParking.git
 #####cd TiESVHack-SmartParking
