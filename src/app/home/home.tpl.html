@@ -1,0 +1,75 @@
+<div class="dashboard-cont">
+  <div class="row">
+    <h3 class="blink_me text-center" style="color:red;">{{vClockDate | date:'medium'}}</h3>
+    <button style="float:right; height: 30px; background:#1f252e; color: #fff; padding: 5px 10px; border:0; float:right; margin: 0 10px;" ng-click="saveParkingLotInfoInCityParkingApp()">Post ParkingzLotInfo to OperatorApp Now</button>
+    <button style="float:right; height: 30px; background:green; color: #fff; padding: 5px 10px; border:0; float:right; margin: 0 10px;" ng-click="saveParkingLotInfoInCityParkingApp()">Post ParkingLotInfo to CityParkingApp Now</button>
+    <span style="font-weight:bold; color:blue; float:right; margin: 5px 20px;">* Posting parking lot info to City Parking App every 5 minutes</span>
+  </div>
+  <hr/>
+  <div class="row">
+    <div class="col-md-6" style="font-size:14px;">
+      <h3>Select Operator</h3>
+      <div class="form-group">
+          <div class="radio">
+              <label>
+                  <input type="radio" name="op" value="KIYL24FFAAAH6AAAAF7ARFDI" ng-model="formData.oprator" ng-change="opratorChanged('KIYL24FFAAAH6AAAAF7ARFDI')">
+                  KIYL24FFAAAH6AAAAF7ARFDI
+              </label>
+          </div>
+          <div class="radio">
+              <label>
+                  <input type="radio" name="op" value="KIYPD5Y5AAAH6AAAAGARD7GA" ng-model="formData.oprator" ng-change="opratorChanged('KIYPD5Y5AAAH6AAAAGARD7GA')">
+                  KIYPD5Y5AAAH6AAAAGARD7GA
+              </label>
+          </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <h3>Operator Details</h3>
+      <p><strong>Loyalty Credit: </strong>{{selectedOperator.LoyaltyCredit == '0E-10' ? 0 : selectedOperator.LoyaltyCredit}} &nbsp; &nbsp;&nbsp;<strong>Day Revenue: </strong>{{selectedOperator.DayRevenue == '0E-10' ? 0 : selectedOperator.DayRevenue}}, &nbsp;&nbsp;&nbsp;  <strong>Total Revenue: </strong>{{selectedOperator.TotalRevenue == '0E-10' ? 0 : selectedOperator.TotalRevenue}}</p>
+
+  </div>
+  </div>
+  <hr/>
+  <div class="row">
+    <div class="col-md-6">
+      <div><h3>{{selectedOperator.LotID1}}</h3></div>
+      <div><h4>Set Daily Price ($ per Hour)</h4></div>
+      <div>
+        <rzslider
+         rz-slider-model="lot1Slider.value"
+         rz-slider-options="lot1Slider.options"></rzslider><br/><br/>
+         <p style="color:blue; font-weight:bold;">Slide to set daily price (hourly rate)</p>
+      </div>
+      <hr/>
+      <div>
+        <div class="slot-tile" ng-repeat="slot in lot1Slots">
+          <img src="assets/car2.png" ng-if="slot.ParkingSpot.SpotStatus=='Full'">
+          <span ng-if="slot.ParkingSpot.SpotStatus=='Available'" style="color:green;">Available</span>
+          <span ng-if="slot.ParkingSpot.SpotStatus=='Reserved'" style="color:red;">Reserved</span>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div><h3>{{selectedOperator.LotID2}}</h3></div>
+      <div><h4>Set Daily Price ($ per Hour)</h4></div>
+      <div>
+        <rzslider
+         rz-slider-model="lot2Slider.value"
+         rz-slider-options="lot2Slider.options"></rzslider><br/><br/>
+         <p style="color:red; font-weight:bold;">* Daily price must be set before 8 AM</p>
+      </div>
+      <hr/>
+      <div>
+        <div class="slot-tile" ng-repeat="slot in lot2Slots">
+          <img src="assets/car2.png" ng-if="slot.ParkingSpot.SpotStatus=='Full'">
+          <span ng-if="slot.ParkingSpot.SpotStatus=='Available'"  style="color:green;">Available</span>
+          <span ng-if="slot.ParkingSpot.SpotStatus=='Reserved'" style="color:red;">Reserved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  
+</div>

@@ -1,0 +1,49 @@
+<style>
+  .ng-map-info-window {
+    background-color: navy;
+    color: #fff;
+  }
+  .ng-map-info-window div:first-child > div:nth-child(1) {
+    border-top-color: navy !important;
+  }
+  .ng-map-info-window div:first-child > div:nth-child(3) div {
+    background-color: transparent !important;
+  }
+  .ng-map-info-window div:first-child > div:nth-child(4) {
+    background-color: transparent !important;
+  }
+</style>
+<div class="row dashboard-cont">
+	<div>
+		<div><h3>Parking Lots</h3></div>
+		<ng-map default-style="true" center="{{parkingLots[0].ParkingLot.LotLocation.Latitude}},{{parkingLots[0].ParkingLot.LotLocation.Longitude}}" zoom="14" style="height:100%;">
+	      <marker position="{{lot.ParkingLot.LotLocation.Latitude}},{{lot.ParkingLot.LotLocation.Longitude}}"
+	        on-click="map.showInfoWindow('bar')" ng-repeat="lot in parkingLots">
+	      </marker>
+	      <info-window id="bar">
+	        <div ng-non-bindable>
+	          <div id="siteNotice"></div>
+	          <div id="bodyContent">
+	            <p>Info window</p>
+	          </div>
+	        </div>
+	      </info-window>
+	    </ng-map>
+	</div>
+	<div>
+		<div><h3>Drivers</h3></div>
+		<ng-map default-style="true" center="{{drivers[0].Driver.HomeLocation.Latitude}},{{drivers[0].Driver.HomeLocation.Longitude}}" zoom="14" style="height:100%;">
+	      <marker position="{{driver.Driver.HomeLocation.Latitude}},{{driver.Driver.HomeLocation.Longitude}}"
+	        on-click="map.showInfoWindow('bar')" ng-repeat="driver in drivers">
+	      </marker>
+	      <info-window id="bar">
+	        <div ng-non-bindable>
+	          <div id="siteNotice"></div>
+	          <div id="bodyContent">
+	            <p>Info window</p>
+	          </div>
+	        </div>
+	      </info-window>
+	    </ng-map>
+	</div>
+</div>
