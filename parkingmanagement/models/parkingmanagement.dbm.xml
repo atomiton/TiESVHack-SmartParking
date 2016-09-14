@@ -1,0 +1,196 @@
+<Namespace Name="parkingmanagement">
+    <Domain Name="management">
+        <Def name="Inc">
+            <Include>[:RuntimeParams.TypesLocation:]parkingmanagement.types.xml
+            </Include> 
+        </Def>
+		
+        <AppFacet>
+            <Include>[:RuntimeParams.ThingFacetLocation:]CSVLoader.df.xml
+            </Include>
+        </AppFacet>
+        
+		<Def name="GeoPoint" >
+			<Number name="Latitude" />
+			<Number name="Longitude" />
+		</Def>
+
+		<AppFacet>
+			<Include>[:RuntimeParams.ThingFacetLocation:]DriverFacet.af.xml
+			</Include>
+		</AppFacet>
+		
+		<AppModel name="DriverController" combines="DriverFacet">
+			<Sid name="Id" />
+		</AppModel>
+		
+		<AppFacet>
+			<Include>[:RuntimeParams.ThingFacetLocation:]TimedEventControllerFacet.af.xml
+			</Include>
+		</AppFacet>
+		
+		<AppModel name="TimedEventController" combines="TimedEventControllerFacet">
+			<Sid name="Id" />
+		</AppModel>
+        
+		<DataModel Name="Driver" >
+            <Sid name="ID" />
+			<String name="DriverID"/>
+			<Boolean name="Decision" />
+			<String name="ParkedLotID" />
+			<Number name="LastUtilityFunction" />
+			<Time name="TimeParked"/>
+			<GeoPoint name="HomeLocation"/>
+        </DataModel>
+
+        <DataModel Name="DriverDestination">
+            <Sid name="ID" />
+            <GeoPoint name="Destination"/>
+        </DataModel>
+		
+		<DataModel name="ParkingLot" >
+            <Sid name="ID" />
+            <String name="LotID" />
+            <String name="OperatorID"/>
+            <GeoPoint name="LotLocation" />
+            <String name="DigitalDisplay" />
+            <Number name="ReservationPrice" />
+            <Integer name="RegisteredVacancy" />
+            <String name="AuthorizedOperator" />
+		</DataModel>
+		
+        <DataModel Name="ParkingLotOption">
+            <Sid name="ID" />
+            <String name="LotID" />
+            <Number name="AssuranceOfAvailability"/>
+            <Number name="Trustworthiness"/>
+            <Number name="Price"/>
+        </DataModel>
+
+        <DataModel Name="ParkingSpot">
+            <Sid name="ID" />
+            <String name="SpotID" />
+            <String name="LotID" />
+            <String name="SpotStatus"/>
+            <Time name="SpotOccupiedSince"/>
+			<Integer name="HourToEmpty" />
+        </DataModel>
+        
+        <DataModel name="ParkingLotOperator">
+            <Sid name="ID" />
+            <String name="OperatorID"/>
+            <String name="OperatorAppID"/>
+            <Number name="DayRevenue" />
+            <Number name="LotOnePrice" />
+            <Number name="LotTwoPrice" />
+            <String name="LotID1" />
+            <String name="LotID2" />
+            <Number name="TotalRevenue" />
+            <String name="AuthorizedOperator" />
+            <Number name="LoyaltyCredit"/>
+        </DataModel>
+        
+        <DataModel Name="OperatorApp">
+            <Sid name="AppID" />
+            <String name="OperatorID" />
+            <String name="OperatorAppID" />
+            <Number name="AppRating" />  
+            <String name="LotID" />
+            <GeoPoint name="LotLocation" />
+            <DateTime name="ParkingDateAndTime" />
+            <Number name="TodaysPrice" />
+            <Integer name="CurrentVacancies"/>
+            <Boolean name="ReservationOffered"/>
+            <Number name="ReservationPrice"/>
+            <Number name="OperatorAppValue"/>
+        </DataModel>
+
+        <DataModel Name="CityParkingApp">
+            <Sid name="ID" />   
+            <String name="OperatorID" />   
+            <String name="LotID" />   
+            <GeoPoint name="LotLocation" />
+            <DateTime name="LastInfoUpdate" />
+            <Number name="TodaysPrice" />
+            <DateTime name="LastAppUpdate" />
+            <Integer name="CurrentVacancies" />
+			<Number name="OperatorReputation" />
+        </DataModel>
+		
+        <DataModel Name="CityParkingAppUpdates">
+            <String name="OperatorID" />   
+            <String name="LotID" />   
+            <GeoPoint name="LotLocation" />
+            <DateTime name="LastInfoUpdate" />
+            <Number name="TodaysPrice" />
+            <Integer name="CurrentVacancies" />
+        </DataModel>
+        
+		<DataModel name="TempDriverPath">
+			<String name="DriverID" />
+			<Integer name="Position" />
+			<GeoPoint name="Location" />
+			<Integer name="DistanceFromDest" />
+		</DataModel>
+
+		<DataModel Name="VirtualClock">
+			<Sid name="ID" />
+			<DateTime name="Date" format="$SimpleDateFormat(yyyy-MM-dd'T'HH:mm:ss'Z')"  />
+			<Integer name="Hour" />
+			<Integer name="Days" />
+		</DataModel>
+		
+		<DataModel Name="ReservationRequests">
+			<Sid name="ID" />
+			<String name="OperatorID" />
+			<String name="LotID" />
+			<String name="DriverID" />
+			<String name="SpotID" />
+			<Number name="ReservationPrice" />
+		</DataModel>
+		
+		<DataModel Name="DriverOperator">
+            <Sid name="ID" />
+            <String name="OperatorID" />
+            <String name="DriverID" />
+            <Number name="LoyaltyCredit" />
+        </DataModel>
+		
+		<DataModel name="DeveloperDetails">
+	            <Sid name="ID" />
+	            <String name="UserName"/>
+		</DataModel>
+	
+		<DataModel name="ParkingLotMappings">
+			<Sid name="ID" />
+			<String name="DeveloperID"/>
+			<String name="ParkingLotId"/>
+			<String name="AccessType"/>
+		</DataModel>
+	
+		<DataModel name="ParkingLotIDs">
+			<Sid name="ID"/>
+			<String name="LotID"/>
+		</DataModel>
+				
+		<DataModel Name="DriverTravelInfo">
+			<Sid name="ID" />
+			<String name="OperatorAppID" />
+			<String name="DriverID" />
+			<GeoPoint name="DestinationLocation" />
+			<Time name="TimeParked"/>            
+			<GeoPoint name="CurrentLocation" />
+			<Integer name="StartTime" />
+		</DataModel>
+		
+		<DataModel Name="TempReservationRequest">
+			<Sid name="ID" />
+			<String name="OperatorID" />
+			<String name="LotID" />
+			<String name="DriverID" />
+			<String name="SpotID" />
+			<Number name="ReservationPrice" />
+			<Number name="LastUtilityFunction" />
+		</DataModel>
+    </Domain>
+</Namespace>

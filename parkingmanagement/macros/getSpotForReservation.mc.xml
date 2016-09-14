@@ -1,0 +1,51 @@
+<Macro name="getSpotForReservation">
+	<Argument>
+		<String name="LotID"/>
+		<String name="DriverID"/>
+	</Argument>
+	<Result>
+		<Log Message="******* starting getSpotForReservation******** "/>
+		<SetProcessData>
+			<Key>LotID</Key>
+			<Value>[:$Macro.Argument.LotID:]</Value>
+		</SetProcessData>
+		
+		<SetProcessData>
+			<Key>DriverID</Key>
+			<Value>[:$Macro.Argument.DriverID:]</Value>
+		</SetProcessData>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<find>
+   						<ParkingSpot>
+     						<LotID eq="[:$Macro.Argument.LotID:]"/>
+     						<SpotStatus eq="Available"/>
+						</ParkingSpot>
+					</find>	
+					<if condition="/[:$Response.Message.Value.Find/count(Result):] gt 0">
+						<then>
+							<Log Message="[:$ProcessData.LotID:]"/>
+							<Log Message="[:$ProcessData.DriverID:]"/>	
+							<Log Message=" SpotID :[:$Response.Message.Value.Find.Result.ParkingSpot.SpotID:]"/>
+
+							<SetProcessData>
+								<Key>SpotID</Key>
+								<Value>[:$Response.Message.Value.Find.Result.ParkingSpot.SpotID:]</Value>
+							</SetProcessData>
+
+							<makeReservation>
+								<DriverID>[:$ProcessData.DriverID:]</DriverID>
+								<LotID>[:$ProcessData.LotID:]</LotID>
+								<SpotID>[:$ProcessData.SpotID:]</SpotID>
+							</makeReservation>
+						</then>
+						<else>
+							<Log Message="******* No parking spot avialable******** "/>
+						</else> 
+					</if>
+				</Query>
+			</QueryString>
+		</executeQuery>
+	</Result>
+</Macro>

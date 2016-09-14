@@ -1,0 +1,120 @@
+<Macro name="getLotsSortedByDist">
+	<Argument>
+		<CurrLat />
+		<CurrLon />
+	</Argument>
+	
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find>
+						<CityParkingApp>
+							<as>var.cpa</as>
+							<ID ne="" />
+						</CityParkingApp>
+						<ParkingSpot>
+							<LotID>var.cpa.LotID</LotID>
+							<SpotStatus>Available</SpotStatus>
+						</ParkingSpot>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<Log message="output: [:$response.Message.Value:]" />
+		<JavaScript>
+			function LotClass(lotID, distance, price) {
+				this.lotID = lotID;
+				this.distance = parseFloat(distance);
+				if(price == '0-E10') {
+					this.price = 0;
+				} else {
+					this.price = parseFloat(price);
+				}
+			}
+
+			var ResultSet = sffContext.getResponse().Message.Value;
+			var creds = [];
+
+			sffLog.info("ResultSet.Find: " + ResultSet.Find);
+			
+			for each(var result in ResultSet.Find) {
+				sffLog.info("result: " + result);
+				if(typeof(result) == 'object') {
+
+					sffLog.info("lotLatitude: " + result.CityParkingApp.LotLocation.Latitude);
+					sffLog.info("lotLongitude: " + result.CityParkingApp.LotLocation.Longitude);
+					sffLog.info("currLat: [:$Macro.Argument.CurrLat:]");
+					sffLog.info("currLong: [:$Macro.Argument.CurrLat:]");
+
+					var lotLatitude = parseFloat(result.CityParkingApp.LotLocation.Latitude);
+					var lotLongitude = parseFloat(result.CityParkingApp.LotLocation.Longitude);
+					var currLat = parseFloat("[:$Macro.Argument.CurrLat:]");
+					var currLong = parseFloat("[:$Macro.Argument.CurrLon:]");
+
+					var distance = parseFloat(Math.sqrt((lotLatitude - currLat)*(lotLatitude - currLat) + (lotLongitude -currLong) * (lotLongitude - currLong)) ) ;
+
+					if(distance.isNaN()) {
+						distance = 99999;
+					}	
+
+					sffLog.info("LotID: " + result.CityParkingApp.lotID + " Distance: " + distance + " Price: " + result.CityParkingApp.price);
+
+					creds.push(new LotClass(result.CityParkingApp.LotID, distance, result.CityParkingApp.TodaysPrice));
+					sffLog.info("pushed to creds.....");
+				}
+			}
+
+			creds.sort(function (a,b){
+				return (a.distance - b.distance);
+			});
+
+			var response = [];
+
+			var setResponseData = ListMap.static.newInstance();   
+			var rc = setResponseData.instanceAdd("AddResponseData");
+			rc.put("Key", "Message.Value.Result");
+			rc.put("Value", "");
+			response.push(setResponseData);
+
+			for(i = 0; i &lt; creds.length; i++) {
+				var setResponseLot = ListMap.static.newInstance();   
+				var rc = setResponseLot.instanceAdd("AddResponseData");
+				rc.put("Key","Message.Value.Result.Lot");
+				rc.put("Value", "");
+				response.push(setResponseLot);
+
+				var setResponseLotId = ListMap.static.newInstance();   
+				var rc = setResponseLotId.instanceAdd("AddResponseData");
+				rc.put("Key","Message.Value.Result.Lot.ID");
+				rc.put("Value",creds[i].lotID);
+				response.push(setResponseLotId);
+
+				var setResponseDist = ListMap.static.newInstance();   
+				var rc = setResponseDist.instanceAdd("AddResponseData");
+				rc.put("Key","Message.Value.Result.Lot.Distance");
+				rc.put("Value",creds[i].distance);
+				response.push(setResponseDist);
+
+				var setResponsePrice = ListMap.static.newInstance();   
+				var rc = setResponsePrice.instanceAdd("AddResponseData");
+				rc.put("Key","Message.Value.Result.Lot.Price");
+				rc.put("Value",creds[i].price);
+				response.push(setResponsePrice);
+
+			}
+
+			var output = "";
+
+			for(x = 0; x &lt; response.length; x++) {
+				output = output + response[x];
+			}
+
+			sffLog.info("output: " + output);
+
+			output;
+
+		</JavaScript>
+		<DelResponseData key="Message.Value.Find" />
+	</Result>
+</Macro>

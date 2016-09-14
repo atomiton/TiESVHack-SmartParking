@@ -1,0 +1,60 @@
+<Macro name="updateParkingLotOperatorRevenue">
+	<Argument>
+		<Number name="Amount"/>
+		<String name="OperatorID"/>
+	</Argument>
+	<Result>
+		<executeQuery>
+			<Log message="Entered the updateParkingLotOperatorRevenue Method" />
+			<Log message="Entered the updateParkingLotOperatorRevenue Method: [:$Macro.Argument.Amount:]" />
+			<Log message="Entered the updateParkingLotOperatorRevenue Method: [:$Macro.Argument.OperatorID:]" />
+			<QueryString>
+				<Query>
+					<find format="current,version">
+   						<ParkingLotOperator>
+     						<OperatorID eq="[:$Macro.Argument.OperatorID:]"/>
+						</ParkingLotOperator>
+					</find>
+					<SetProcessData>
+						<Key>DayRevenue</Key>
+						<Value>[:$Response.Message.Value.Find.Result.ParkingLotOperator.DayRevenue.Value:]</Value>
+					</SetProcessData>	
+					<SetProcessData>
+						<Key>TotalRevenue</Key>
+						<Value>[:$Response.Message.Value.Find.Result.ParkingLotOperator.TotalRevenue.Value:]</Value>
+					</SetProcessData>
+					<JavaScript>
+							var totalRevenue = 0;
+							if("[:$ProcessData.TotalRevenue:]" != '0E-10') {
+								totalRevenue = parseFloat("[:$ProcessData.TotalRevenue:]");
+							} 
+							
+							if(totalRevenue != 0 &amp;&amp; totalRevenue.isNaN()) {
+								totalRevenue = 0;
+							}
+							
+							var amount = parseFloat("[:$Macro.Argument.Amount:]");
+							var totalRevenue = totalRevenue + amount ;
+							sffLog.info("amount  ======" + amount );
+							sffLog.info("TotalRevenue  ======" + totalRevenue );
+							sffContext.setLocalData("TotalRevenue",totalRevenue);
+					</JavaScript>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.ParkingLotOperator.TotalRevenue.Value</Key>
+						<Value>[:$LocalData.TotalRevenue:]</Value>
+					</SetResponseData>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.ParkingLotOperator.DayRevenue.Value</Key>
+						<Value>[:$Macro.Argument.Amount:]</Value>
+					</SetResponseData>
+
+					<Update>
+						<from>Result</from>
+						<Include>$Response.Message.Value.Find</Include>
+					</Update>	
+				</Query>
+			</QueryString>
+	   </executeQuery>
+		
+	</Result>
+</Macro>

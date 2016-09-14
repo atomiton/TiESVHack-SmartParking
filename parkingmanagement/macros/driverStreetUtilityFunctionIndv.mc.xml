@@ -1,0 +1,26 @@
+<Macro name="driverStreetUtilityFunctionIndv">
+	<Argument>
+		<String name="driverId" />
+		<Number name="CeilingPrice" />
+		<Number name="DestinationPrice" />
+	</Argument>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find>
+						<ParkingLotOption>
+							<Id ne="" />
+						</ParkingLotOption>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<For each="res" in="Find.Result.Driver" using="$ProcessData" >
+			<driverStreetUtilityFunctionPL>
+				<id>[:$ProcessData.res.Driver.Id:]</id>	
+				
+			</driverStreetUtilityFunctionPL>			
+		</For>
+	</Result>
+</Macro>

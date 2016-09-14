@@ -1,0 +1,16 @@
+<Macro Name="DeleteScheduleJob">
+	<Argument>
+		<JobName/>
+	</Argument>
+	<Result>
+		<DoRequest target="[:RuntimeParams.TQLStudio_SequenceFacetIDName:]">
+			<Process Return="CMD_NOP">
+				<Message type="xml">
+					<Value>
+						<Remove eid="[:$Macro.Argument.JobName:]"/>
+					</Value>
+				</Message>
+			</Process>
+		</DoRequest>
+	</Result>
+</Macro>

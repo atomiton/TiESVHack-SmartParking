@@ -1,0 +1,9 @@
+<Query>
+    <Find>
+        <ParkingLot>
+            <Name>
+                <eq>UCI Lot 14 - Pereira Dr</eq>
+            </Name>
+        </ParkingLot>
+    </Find>
+</Query>

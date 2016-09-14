@@ -1,0 +1,23 @@
+<Macro Name="addDriverDestination">
+	<Argument>
+		<Number name="DestinationLatitude"/>
+		<Number name="DestinationLongitude"/>
+	</Argument>
+	<Result>
+		<Log Message="Saving Driver's Destinaton Info..." />
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Save>
+						<DriverDestination>
+							<Destination>
+								<Latitude>[:$Macro.Argument.DestinationLatitude:]</Latitude>
+								<Longitude>[:$Macro.Argument.DestinationLongitude:]</Longitude>
+							</Destination>
+						</DriverDestination>
+					</Save>
+				</Query>
+			</QueryString>
+		</executeQuery>
+	</Result>
+</Macro>

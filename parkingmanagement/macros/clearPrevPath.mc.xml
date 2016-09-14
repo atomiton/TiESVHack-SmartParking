@@ -1,0 +1,19 @@
+<Macro name="clearPrevPath">
+	<Argument>
+		<DriverID></DriverID>
+	</Argument>
+	
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<DeleteAll>
+						<TempDriverPath>
+							<DriverID eq="[:$Macro.Argument.DriverID:]" />
+						</TempDriverPath>							
+					</DeleteAll>
+				</Query>
+			</QueryString>
+		</executeQuery>	
+	</Result>
+</Macro>

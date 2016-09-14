@@ -1,0 +1,28 @@
+<Macro name="updateDriverDecision">
+	<Argument>
+		<String name="DriverID"/>
+		<Boolean name="Decision" />
+	</Argument>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="version">
+						<Driver>
+							<DriverID eq="[:$Macro.Argument.DriverID:]" />
+						</Driver>
+					</Find>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.Driver.Decision.Value</Key>
+						<Value>[:$Macro.Argument.Decision:]</Value>
+					</SetResponseData>
+					<Log Message="Driver Decision:::::::: =====> [:$Response.Message.Value.Find.Result.Driver.Decision.Value:]"/>
+					<Update>
+						<from>Result</from>
+						<Include>$Response.Message.Value.Find</Include>
+					</Update>
+				</Query>
+			</QueryString>
+		</executeQuery>
+	</Result>
+</Macro>

@@ -1,0 +1,27 @@
+<Macro name="BTFSInvoke">
+  <Argument>
+    <Name>DEFAULT</Name>
+    <Out/>
+    <Wid/>
+    <Target/>
+  </Argument>
+  <Result>
+    <Event name="COMPLETE.[:$Macro.Argument.Name:]"/>
+    <Set name="[:$Macro.Argument.Name:]" wid="[:$Macro.Argument.Wid:]" target="[:$Macro.Argument.Target:]">
+      <Value>
+        <Include>$Macro.Argument</Include>
+        <reverseBridge>
+          <BTCode>
+            <Set wid="[:Behavior.wid:]" target="[:$Macro.Argument.Out:]">
+              <Value>
+                <Include>[%:@WFRT:%]$Response.Message.Value</Include>
+              </Value>
+            </Set>
+            <Set wid="[:Behavior.wid:]" target="[:$QNS:]COMPLETE.[:$Macro.Argument.Name:]" value="true"/>
+          </BTCode>
+        </reverseBridge>
+      </Value>
+    </Set>
+    <Wait name="WAIT.[:$Macro.Argument.Name:]" value="COMPLETE.[:$Macro.Argument.Name:]"/>
+  </Result>
+</Macro>

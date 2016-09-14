@@ -1,0 +1,65 @@
+<Macro name="checkInVisualRange">
+	<Argument>
+		<DriverID></DriverID>
+		<PriceCeiling></PriceCeiling>
+		<DistanceCeiling></DistanceCeiling>
+		<DestLat></DestLat>
+		<DestLon></DestLon>
+		<CurrLat></CurrLat>
+		<CurrLon></CurrLon>
+		<ParkTime></ParkTime>
+		<LastUtilityFunction></LastUtilityFunction>
+	</Argument>
+	<Result>
+	<Log Message="****************** START checkInVisualRange ***************************"/>
+		<Log message="***************** CHECKING AT VISUAL RANGE *******************************" />
+		<Log message="***************** Calling checkParkingLotNearby from checkInVisualRange*******************************" />
+		
+		<checkParkingLotNearby>
+			<CurrLat>[:$Macro.Argument.CurrLat:]</CurrLat>
+			<CurrLon>[:$Macro.Argument.CurrLon:]</CurrLon>
+			<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+		</checkParkingLotNearby>
+		<Log message="***************** Calling offerReservation from checkInVisualRange*******************************" />
+		<Log Message="DriverID+++++++++++ [:$Macro.Argument.DriverID:]"/>
+		<Log Message="PriceCeiling+++++++++++ [:$Macro.Argument.PriceCeiling:]"/>
+		<Log Message="DistanceCeiling+++++++++++ [:$Macro.Argument.DistanceCeiling:]"/>
+		<Log Message="DestLat+++++++++++ [:$Macro.Argument.DestLat:]"/>
+		<Log Message="DestLon+++++++++++ [:$Macro.Argument.DestLon:]"/>
+		<Log Message="CurrLat+++++++++++ [:$Macro.Argument.CurrLat:]"/>
+		<Log Message="CurrLon+++++++++++ [:$Macro.Argument.CurrLon:]"/>
+		<Log Message="ParkTime+++++++++++ [:$Macro.Argument.ParkTime:]"/>
+		<Log Message="LastUtilityFunction+++++++++++ [:$Macro.Argument.LastUtilityFunction:]"/>
+		
+		<Log message="Candidate: [:$Response.Message.Value.Result:]" />
+		
+		<IF condition="/'[:$Response.Message.Value.Result.Found:]' eq 'true'">
+			<then>
+				<offerReservationVisualRange>
+					<LotID>[:$Response.Message.Value.Result.Candidate.LotID:]</LotID>
+					<SpotID></SpotID>
+					<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+					<DistanceCeiling>[:$Macro.Argument.DistanceCeiling:]</DistanceCeiling>
+					<PriceCeiling>[:$Macro.Argument.PriceCeiling:]</PriceCeiling>
+					<DestLat>[:$Macro.Argument.DestLat:]</DestLat>
+					<DestLon>[:$Macro.Argument.DestLon:]</DestLon>
+					<ParkTime>[:$Macro.Argument.ParkTime:]</ParkTime>
+					<TodaysPrice>[:$Response.Message.Value.Result.Candidate.Price:]</TodaysPrice>
+					<PriceSource></PriceSource>
+					<OperatorID>[:$Response.Message.Value.Result.Candidate.OperatorID:]</OperatorID>
+					<LastUtilityFunction>[:$ProcessData.LastUtilityFunction:]</LastUtilityFunction>
+					<CurrentVacancies>1</CurrentVacancies>
+					<OperatorAppValue>0</OperatorAppValue>
+				</offerReservationVisualRange>
+			</then>
+			<else>
+				<findNearestFreeParking>
+					<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+					<CurrLat>[:$Macro.Argument.CurrLat:]</CurrLat>
+					<CurrLon>[:$Macro.Argument.CurrLon:]</CurrLon>
+				</findNearestFreeParking>
+			</else>
+		</IF>
+		<Log Message="****************** END checkInVisualRange ***************************"/>
+	</Result>
+</Macro>

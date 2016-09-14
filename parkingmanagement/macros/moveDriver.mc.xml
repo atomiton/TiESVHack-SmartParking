@@ -1,0 +1,58 @@
+<Macro name="moveDriver">
+	<Argument>
+		<DriverID></DriverID>
+		<Position></Position>
+		<DriverWID></DriverWID>
+	</Argument>
+	
+	<Result>
+		<Log message="****** Position:  [:$Macro.Argument.Position:] ********" />
+		<JavaScript>
+			var position = parseInt("[:$Macro.Argument.Position:]");
+			position = position+1;
+			sffContext.setProcessData("position",position);
+			sffLog.info("position: " + position);
+		</JavaScript>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="current">
+						<TempDriverPath>
+							<DriverID eq="[:$Macro.Argument.DriverID:]"/>
+							<Position eq="[:$ProcessData.position:]" />
+						</TempDriverPath>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<If condition="/[:$Response.Message.Value.Find/count(Result):] eq 0">
+			<then>
+				<reverseBridge>
+					<BTCode>
+						<Set wid="[:$Macro.Argument.DriverWID:]" target="DriverBT.Position" value="-1" />
+					</BTCode>
+				</reverseBridge>
+				<reverseBridge>
+					<BTCode>
+						<Set wid="[:$Macro.Argument.DriverWID:]" target="DriverBT.Travelling" value="no" />
+					</BTCode>
+				</reverseBridge>
+				<reverseBridge>
+					<BTCode>
+						<Set wid="[:$Macro.Argument.DriverWID:]" target="DriverBT.ReachedDestination" value="1" />
+					</BTCode>
+				</reverseBridge>
+			</then>
+			<else>
+				<reverseBridge>
+					<BTCode>
+						<Set wid="[:$Macro.Argument.DriverWID:]" target="DriverBT.Position" value="[:$ProcessData.position:]" />
+						<Set wid="[:$Macro.Argument.DriverWID:]" target="DriverBT.CurrLat" value="[:$Response.Message.Value.Find.Result.TempDriverPath.Location.Latitude:]" />
+						<Set wid="[:$Macro.Argument.DriverWID:]" target="DriverBT.CurrLon" value="[:$Response.Message.Value.Find.Result.TempDriverPath.Location.Longitude:]" />
+						<Set wid="[:$Macro.Argument.DriverWID:]" target="DriverBT.DistToDest" value="[:$Response.Message.Value.Find.Result.TempDriverPath.DistanceFromDest:]" />
+					</BTCode>
+				</reverseBridge>
+			</else>
+		</If>
+	</Result>
+</Macro>

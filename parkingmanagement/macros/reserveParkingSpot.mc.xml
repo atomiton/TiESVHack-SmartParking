@@ -1,0 +1,52 @@
+<Macro name="reserveParkingSpot">
+	<Argument>
+		<String name="SpotID"/>
+		<String name="OperatorID"/>
+	</Argument>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="version">
+						<ParkingSpot>
+							<SpotID eq="[:$Macro.Argument.SpotID:]" />
+						</ParkingSpot>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<SetProcessData>
+			<Key>LotID</Key>
+			<Value>[:$Response.Message.Value.Find.Result.ParkingSpot.LotID.Value:]</Value>
+		</SetProcessData>
+		<checkReadWriteAccess>
+			<LotID>[:$ProcessData.LotID:]</LotID>
+			<OperatorID>[:$Macro.Argument.OperatorID:]</OperatorID>
+		</checkReadWriteAccess>
+		<If condition="/'[:$Response.Message.Value.Result.Access:]' eq 'true'">
+			<then>
+				<executeQuery>
+					<QueryString>
+						<Query>
+							<Find format="version">
+								<ParkingSpot>
+									<SpotID eq="[:$Macro.Argument.SpotID:]" />
+								</ParkingSpot>
+							</Find>
+							<SetResponseData>
+								<Key>Message.Value.Find.Result.ParkingSpot.SpotStatus.Value</Key>
+								<Value>reserved</Value>
+							</SetResponseData>
+							<Update>
+								<from>Result</from>
+								<Include>$Response.Message.Value.Find</Include>
+							</Update>
+						</Query>
+					</QueryString>
+				</executeQuery>
+				<Log Message="ParkingSpot SpotStatus:::::::: =====> [:$Response.Message.Value.Find.Result.ParkingSpot.SpotStatus.Value:]"/>
+			</then>
+		</If>
+		
+	</Result>
+</Macro>

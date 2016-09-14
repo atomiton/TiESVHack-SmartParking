@@ -1,0 +1,16 @@
+<Query>
+    <Find>
+        <Driver>
+            <Id>
+                <ne></ne>
+            </Id>
+        </Driver>
+    </Find>
+    <SetResponseData>
+        <key>Message.Value.Driver.Count</key>
+        <value>[:$Response.Message.Value.Find/count(Result):]</value>
+    </SetResponseData>
+    <DelResponseData>
+        <key>Message.Value.Find</key>
+    </DelResponseData>
+</Query>

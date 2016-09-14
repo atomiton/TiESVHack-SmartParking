@@ -1,0 +1,36 @@
+<Macro Name="reduceParkedTime">
+	<Argument />
+	<Result>
+		<Log Message="Saving createParkingSpot Info..." />
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find>
+						<ParkingSpot>
+							<HourToEmpty gt="0" />
+						</ParkingSpot>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<For each="res" in="Find.Result.ParkingSpot" using="$ProcessData" >
+			<JavaScript>
+				var hours = parseInt("[:$ProcessData.res.HourToEmpty:]");
+				hours = hours-1;
+				var spotID = "[:$ProcessData.res.SpotID:]";
+				var status = "Full";
+				if(hours == 0) {
+					status = "Available";
+				}
+				sffContext.setLocalData("hours",hours);
+				sffContext.setLocalData("status",status);
+				sffContext.setLocalData("spotID",spotID);
+			</JavaScript>
+			<UpdateParkedTime>
+				<SpotID>[:$LocalData.spotID:]</SpotID>
+				<Hour>[:$LocalData.hours:]</Hour>
+				<Status>[:$LocalData.status:]</Status>
+			</UpdateParkedTime>
+		</For>
+	</Result>
+</Macro>

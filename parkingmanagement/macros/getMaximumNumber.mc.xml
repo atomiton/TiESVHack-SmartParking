@@ -1,0 +1,23 @@
+<Macro name="getMaximumNumber">
+	<Argument>
+		<Number name="num1" />
+		<Number name="num2" />
+	</Argument>
+	<Result>
+
+		<if condition="/[:$Macro.Argument.num1:] ge [:$Macro.Argument.num2:]">
+			<then>
+				<SetResponseData>
+					<key>Message.Value.Max</key>
+					<value>[:$Macro.Argument.num1:]</value>
+				</SetResponseData>
+			</then>
+			<else>
+				<SetResponseData>
+					<key>Message.Value.Max</key>
+					<value>[:$Macro.Argument.num2:]</value>
+				</SetResponseData>
+			</else>
+		</if>
+	</Result>
+</Macro>

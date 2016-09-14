@@ -1,0 +1,302 @@
+<Macro Name="driverInitBT">
+  <Argument>
+	<String name="DriverID" />
+	<GeoPoint name="DestinationLocation"/>
+    <Address name="Destination" />
+    <Time name="StartingTime"/>
+    <Number name="ParkTime"/>
+    <String name="ReservedLotID" />
+    <String name="LotID" />
+    <GeoPoint name="CurrentLocation" />
+    <Number name="PriceCeiling" />
+    <Number name="Satisfaction"/>
+  </Argument>
+  <Result>
+	<SetLocalData>
+		<Key>driver</Key>
+		<Value>[:$Macro.Argument.DriverID:]</Value>
+	</SetLocalData>
+    <reverseBridge>
+      	<BTCode>
+	        <Behavior name="DriverBT" wid="driver[:$LocalData.driver:]">
+				<Event name="HourPassed"/>
+				<Event name="CalculateUtility" />
+				<Event name="Reservation" />
+				<Event name="Print" />
+				<Event name="CheckInRange" />
+				<Event name="CalculateFeasibility" />
+				<Event name="ReachedDestination" />
+				<Event name="VisualRange" />
+				<Event name="SetValues" />
+				<Event name="SetValues2" />
+				<Event name="PrivateInfoToDriver" />
+				<Event name="CheckInCPA" />
+				<Event name="Reset" />
+				
+				<Var name="DestLat" default=""/>
+				<Var name="DestLon" default=""/>
+				<Var name="DriverID" default="[:$LocalData.driver:]" />
+				<Var name="TQLResponse" default=""/>
+				<Var name="StartingTime" />
+				<Var name="OperatorAppID1" />
+				<Var name="OperatorAppID2" />
+				<Var name="OperatorAppID3" />
+				<Var name="OperatorAppID" />
+				<Var name="ReservedLotID" />
+				<Var name="OfferedLotID" />
+				<Var name="OfferedPrice" />
+				<Var name="LotID" />
+				<Var name="SpotID" />
+				<Var name="TodaysPrice" />
+				<Var name="OperatorID" />
+				<Var name="CurrLat" />
+				<Var name="CurrLon" />
+				<Var name="PriceCeiling" default="0"/>
+				<Var name="DistanceCeiling" default="0"/>
+				<Var name="ParkTime" default="0"/>
+				<Var name="LoyalityCredit" />
+				<Var name="Satisfaction" />
+				<Var name="InDecisionRange" default="no"/>
+				<Var name="Position" default="-1" />
+				<Var name="DistToDest" />
+				<Var name="Travelling" default="no" />
+				<Var name="Hour" default="-1" />
+				<Var name="DecisionMade" default="no" />
+				<Var name="CurrentVacancies" default="no" />
+				<Var name="OperatorAppValue" default="0" />
+				<Var name="OfferingOperator" default="0" />
+				
+				
+	         	<Parallel repeat="0.." name="DriverParallel">
+				
+					<Sequence repeat="0.." name="PrintLoop">
+						<Wait value="Print"/>
+						<Log message="(Driver): Behavior:[:Behavior.wid:], DriverId:[:DriverBT.DriverID:], DestLat:[:DriverBT.DestLat:], DestLon:[:DriverBT.DestLon:], CurrLat:[:DriverBT.CurrLat:], CurrLon:[:DriverBT.CurrLon:], Position: [:DriverBT.Position:] ,ParkTime:[:DriverBT.ParkTime:], StartingTime:[:DriverBT.StartingTime:], ReservedLotID:[:DriverBT.ReservedLotID:], InDecisionRange:[:DriverBT.InDecisionRange:], Travelling: [:DriverBT.Travelling:], DistToDest: [:DriverBT.DistToDest:] ,  LotID: [:DriverBT.LotID:], APP1: [:DriverBT.OperatorAppID1:], APP2: [:DriverBT.OperatorAppID2:], APP3: [:DriverBT.OperatorAppID3:], TodaysPrice: [:DriverBT.TodaysPrice:], DistanceCeiling: [:DriverBT.DistanceCeiling:], PriceCeiling: [:DriverBT.PriceCeiling:]"/>
+					</Sequence>
+				
+					<Sequence repeat="0.." name="TravellingLoop">
+						<Wait value="Travelling == 'yes'" />
+						<Wait value="HourPassed"/>
+						<Log message="Calling move driver!!" />
+						<BTFSInvoke Name="MoveDriver" wid="BTToTQLWorkflow" Out="DriverBT.TQLResponse" Target="BTTQLBridge.ExecuteDirectQuery.Argument">
+							<moveDriver>
+								<DriverID>[:$ProcessData.$BTV.DriverBT.DriverID:]</DriverID>
+								<Position>[:$ProcessData.$BTV.DriverBT.Position:]</Position>
+								<DriverWID>[:Behavior.wid:]</DriverWID>
+							</moveDriver>
+						</BTFSInvoke>
+						<BTFSInvoke Name="CheckDriverRange" wid="BTToTQLWorkflow" Out="DriverBT.TQLResponse" Target="BTTQLBridge.ExecuteDirectQuery.Argument">
+							<calculateDriverDecisionRange>
+								<DriverID>[:$ProcessData.$BTV.DriverBT.DriverID:]</DriverID>
+								<DistanceCeiling>[:$ProcessData.$BTV.DriverBT.DistanceCeiling:]</DistanceCeiling>
+								<DistToDest>[:$ProcessData.$BTV.DriverBT.DistToDest:]</DistToDest>		
+							</calculateDriverDecisionRange>
+						</BTFSInvoke>
+					</Sequence>
+					
+					<Sequence repeat="0.." name="StartTravellingLoop">
+					<Wait value="StartingTime == Hour" />
+					<Set wid="[:Behavior.wid:]" target="DriverBT.Travelling" value="yes" />
+					<Log message="*****Intravelling loop*****"/>
+						<BTFSInvoke Name="StartTravellingInvoke" wid="BTToTQLWorkflow" Out="DriverBT.TQLResponse" Target="BTTQLBridge.ExecuteDirectQuery.Argument">
+							<createDriverTravelInfo>
+								<OperatorAppID>[:$ProcessData.$BTV.DriverBT.OperatorAppID1:]</OperatorAppID>
+								<DriverID>[:$ProcessData.$BTV.DriverBT.DriverID:]</DriverID>
+								<DestLatitude>[:$ProcessData.$BTV.DriverBT.DestLat:]</DestLatitude>
+								<DestLongitude>[:$ProcessData.$BTV.DriverBT.DestLon:]</DestLongitude>
+								<CurrLatitude>[:$ProcessData.$BTV.DriverBT.CurrLat:]</CurrLatitude>
+								<CurrLongitude>[:$ProcessData.$BTV.DriverBT.CurrLon:]</CurrLongitude>		
+								<TimeParked>[:$ProcessData.$BTV.DriverBT.ParkTime:]</TimeParked>									
+								<StartTime>[:$ProcessData.$BTV.DriverBT.StartingTime:]</StartTime>									
+							</createDriverTravelInfo>
+							<createDriverTravelInfo>
+								<OperatorAppID>[:$ProcessData.$BTV.DriverBT.OperatorAppID2:]</OperatorAppID>
+								<DriverID>[:$ProcessData.$BTV.DriverBT.DriverID:]</DriverID>
+								<DestLatitude>[:$ProcessData.$BTV.DriverBT.DestLat:]</DestLatitude>
+								<DestLongitude>[:$ProcessData.$BTV.DriverBT.DestLon:]</DestLongitude>
+								<CurrLatitude>[:$ProcessData.$BTV.DriverBT.CurrLat:]</CurrLatitude>
+								<CurrLongitude>[:$ProcessData.$BTV.DriverBT.CurrLon:]</CurrLongitude>		
+								<TimeParked>[:$ProcessData.$BTV.DriverBT.ParkTime:]</TimeParked>
+								<StartTime>[:$ProcessData.$BTV.DriverBT.StartingTime:]</StartTime>									
+							</createDriverTravelInfo>
+							<createDriverTravelInfo>
+								<OperatorAppID>[:$ProcessData.$BTV.DriverBT.OperatorAppID3:]</OperatorAppID>
+								<DriverID>[:$ProcessData.$BTV.DriverBT.DriverID:]</DriverID>
+								<DestLatitude>[:$ProcessData.$BTV.DriverBT.DestLat:]</DestLatitude>
+								<DestLongitude>[:$ProcessData.$BTV.DriverBT.DestLon:]</DestLongitude>
+								<CurrLatitude>[:$ProcessData.$BTV.DriverBT.CurrLat:]</CurrLatitude>
+								<CurrLongitude>[:$ProcessData.$BTV.DriverBT.CurrLon:]</CurrLongitude>		
+								<TimeParked>[:$ProcessData.$BTV.DriverBT.ParkTime:]</TimeParked>
+								<StartTime>[:$ProcessData.$BTV.DriverBT.StartingTime:]</StartTime>
+							</createDriverTravelInfo>
+						
+						</BTFSInvoke>
+						<Wait value="Travelling == 'no'" />
+					</Sequence>
+					
+					<Sequence repeat="0.." name="ReachedDestinationLoop">
+						<Wait value="ReachedDestination" />
+						<Wait value="DecisionMade == 'yes'" />
+						<BTFSInvoke Name="parkVehicleInvoke" wid="BTToTQLWorkflow" Out="DriverBT.TQLResponse" Target="BTTQLBridge.ExecuteDirectQuery.Argument">
+							<parkVehicle>
+								<DriverID>[:$ProcessData.$BTV.DriverBT.DriverID:]</DriverID>
+								<SpotID>[:$ProcessData.$BTV.DriverBT.SpotID:]</SpotID>
+								<DistanceCeiling>[:$ProcessData.$BTV.DriverBT.DistanceCeiling:]</DistanceCeiling>
+								<PriceCeiling>[:$ProcessData.$BTV.DriverBT.PriceCeiling:]</PriceCeiling>
+								<ParkTime>[:$ProcessData.$BTV.DriverBT.ParkTime:]</ParkTime>
+								<ReservedLotID>[:$ProcessData.$BTV.DriverBT.ReservedLotID:]</ReservedLotID>
+								<DestLat>[:$ProcessData.$BTV.DriverBT.DestLat:]</DestLat>
+								<DestLon>[:$ProcessData.$BTV.DriverBT.DestLon:]</DestLon>
+								<OperatorID>[:$ProcessData.$BTV.DriverBT.OfferingOperator:]</OperatorID>
+							</parkVehicle>
+						</BTFSInvoke>
+					</Sequence>
+
+					<Sequence repeat="0.." name="ReservationLoop">
+						<Wait value="CalculateFeasibility"/>
+						<Log message="Check For Reservations: Call offerReservationAll" />
+						<BTFSInvoke Name="CalcParamsQuery" wid="BTToTQLWorkflow" Out="DriverBT.TQLResponse" Target="BTTQLBridge.ExecuteDirectQuery.Argument">
+							<offerReservationAll>
+								<DriverID>[:$ProcessData.$BTV.DriverBT.DriverID:]</DriverID>
+								<PriceCeiling>[:$ProcessData.$BTV.DriverBT.PriceCeiling:]</PriceCeiling>
+								<DistanceCeiling>[:$ProcessData.$BTV.DriverBT.DistanceCeiling:]</DistanceCeiling>
+								<DestLat>[:$ProcessData.$BTV.DriverBT.DestLat:]</DestLat>
+								<DestLon>[:$ProcessData.$BTV.DriverBT.DestLon:]</DestLon>
+								<CurrLat>[:$ProcessData.$BTV.DriverBT.CurrLat:]</CurrLat>
+								<CurrLon>[:$ProcessData.$BTV.DriverBT.CurrLon:]</CurrLon>
+								<ParkTime>[:$ProcessData.$BTV.DriverBT.ParkTime:]</ParkTime>
+								<OperatorAppID1>[:$ProcessData.$BTV.DriverBT.OperatorAppID1:]</OperatorAppID1>
+								<OperatorAppID2>[:$ProcessData.$BTV.DriverBT.OperatorAppID2:]</OperatorAppID2>
+								<OperatorAppID3>[:$ProcessData.$BTV.DriverBT.OperatorAppID3:]</OperatorAppID3>
+								<PriceSource>T</PriceSource>
+								<OperatorID>[:$ProcessData.$BTV.DriverBT.OperatorID:]</OperatorID>
+								<LotID>[:$ProcessData.$BTV.DriverBT.LotID:]</LotID>
+								<TodaysPrice>[:$ProcessData.$BTV.DriverBT.TodaysPrice:]</TodaysPrice>
+								<CurrentVacancies>[:$ProcessData.$BTV.DriverBT.CurrentVacancies:]</CurrentVacancies>
+								<OperatorAppValue>[:$ProcessData.$BTV.DriverBT.OperatorAppValue:]</OperatorAppValue>
+							</offerReservationAll>
+						</BTFSInvoke>
+					</Sequence>
+
+					<Sequence repeat="0.." name="CalculateFeasibilityLoop">
+						<Wait value="InDecisionRange == 'yes'"/>
+						<Log message="~~~~~~~~~~~~after InDecisionRange~~~~~~~~~~~~~~"/>
+						<BTFSInvoke Name="CalcFeasibility" wid="BTToTQLWorkflow" Out="DriverBT.TQLResponse" Target="BTTQLBridge.ExecuteDirectQuery.Argument">			
+						<offerReservationCPAAll>
+							<DriverID>[:$ProcessData.$BTV.DriverBT.DriverID:]</DriverID>
+							<PriceCeiling>[:$ProcessData.$BTV.DriverBT.PriceCeiling:]</PriceCeiling>
+							<DistanceCeiling>[:$ProcessData.$BTV.DriverBT.DistanceCeiling:]</DistanceCeiling>
+							<DestLat>[:$ProcessData.$BTV.DriverBT.DestLat:]</DestLat>
+							<DestLon>[:$ProcessData.$BTV.DriverBT.DestLon:]</DestLon>
+							<CurrLat>[:$ProcessData.$BTV.DriverBT.CurrLat:]</CurrLat>
+							<CurrLon>[:$ProcessData.$BTV.DriverBT.CurrLon:]</CurrLon>
+							<ParkTime>[:$ProcessData.$BTV.DriverBT.ParkTime:]</ParkTime>
+						</offerReservationCPAAll>										
+						</BTFSInvoke>
+						<Wait value="Reset"/>
+					</Sequence>
+				
+					<Sequence repeat="0.." name="PrivateInfoToDriverLoop">
+						<Wait value="PrivateInfoToDriver"/>
+						<Log message="Check For PrivateInfoToDriver: Call PrivateInfoToDriver" />
+						<BTFSInvoke Name="CalcParamsQuery" wid="BTToTQLWorkflow" Out="DriverBT.TQLResponse" Target="BTTQLBridge.ExecuteDirectQuery.Argument">
+							<offerReservationChkAndAssign>
+								<DriverID>[:$ProcessData.$BTV.DriverBT.DriverID:]</DriverID>
+								<PriceCeiling>[:$ProcessData.$BTV.DriverBT.PriceCeiling:]</PriceCeiling>
+								<DistanceCeiling>[:$ProcessData.$BTV.DriverBT.DistanceCeiling:]</DistanceCeiling>
+								<DestLat>[:$ProcessData.$BTV.DriverBT.DestLat:]</DestLat>
+								<DestLon>[:$ProcessData.$BTV.DriverBT.DestLon:]</DestLon>
+								<ParkTime>[:$ProcessData.$BTV.DriverBT.ParkTime:]</ParkTime>
+								<PriceSource>T</PriceSource>
+								<SpotID>[:$ProcessData.$BTV.DriverBT.SpotID:]</SpotID>
+								<TodaysPrice>[:$ProcessData.$BTV.DriverBT.OfferedPrice:]</TodaysPrice>
+								<LotID>[:$ProcessData.$BTV.DriverBT.OfferedLotID:]</LotID>
+								<OperatorAppValue>[:$ProcessData.$BTV.DriverBT.OperatorAppValue:]</OperatorAppValue>
+							</offerReservationChkAndAssign>
+						</BTFSInvoke>
+					</Sequence>
+
+					<Sequence repeat="0.." name="decisionloop">
+						<Wait value="CheckInRange"/>
+						<Log message="In Decision loop"/>
+						<BTFSInvoke Name="CalcDecisionQuery" wid="BTToTQLWorkflow" Out="DriverBT.TQLResponse" Target="BTTQLBridge.ExecuteDirectQuery.Argument">
+							<calculateDriverDecisionRange>
+								<DriverID>[:$ProcessData.$BTV.DriverBT.DriverID:]</DriverID>
+								<DistanceCeiling>[:$ProcessData.$BTV.DriverBT.DistanceCeiling:]</DistanceCeiling>
+								<DestLat>[:$ProcessData.$BTV.DriverBT.DestLat:]</DestLat>
+								<DestLon>[:$ProcessData.$BTV.DriverBT.DestLon:]</DestLon>
+								<CurrLat>[:$ProcessData.$BTV.DriverBT.CurrLat:]</CurrLat>
+								<CurrLon>[:$ProcessData.$BTV.DriverBT.CurrLon:]</CurrLon>		
+							</calculateDriverDecisionRange>
+						</BTFSInvoke>
+					</Sequence>
+
+					<Sequence repeat="0.." name="VisualRangeLoop">
+						<Wait value="VisualRange"/>
+						<Log message="*****In visuanl range loop****"/>
+						<BTFSInvoke Name="CalcInVisualRange" wid="BTToTQLWorkflow" Out="DriverBT.TQLResponse" Target="BTTQLBridge.ExecuteDirectQuery.Argument">			
+							<checkParkingLotNearby>
+								<DriverID>[:$ProcessData.$BTV.DriverBT.DriverID:]</DriverID>
+								<CurrLat>[:$ProcessData.$BTV.DriverBT.CurrLat:]</CurrLat>
+								<CurrLon>[:$ProcessData.$BTV.DriverBT.CurrLon:]</CurrLon>	
+							</checkParkingLotNearby>
+							<Log message="TodaysPrice:================= [:$ProcessData.$BTV.DriverBT.TodaysPrice:]"/>
+							<Log message="TodaysPrice:================= [:DriverBT.TodaysPrice:]"/>
+						</BTFSInvoke>
+						<Wait value="SetValues"/>
+						<BTFSInvoke Name="ChkInVisualRange" wid="BTToTQLWorkflow" Out="DriverBT.TQLResponse" Target="BTTQLBridge.ExecuteDirectQuery.Argument">	
+							<Log message="TodaysPrice After Set Values:================= [:$ProcessData.$BTV.DriverBT.TodaysPrice:]"/>
+							<Log message="TodaysPrice After Set Values:================= [:DriverBT.TodaysPrice:]"/>
+							<offerReservation>
+								<LotID>[:$ProcessData.$BTV.DriverBT.LotID:]</LotID>
+								<SpotID></SpotID>
+								<DriverID>[:$ProcessData.$BTV.DriverBT.DriverID:]</DriverID>
+								<PriceCeiling>[:$ProcessData.$BTV.DriverBT.PriceCeiling:]</PriceCeiling>
+								<DistanceCeiling>[:$ProcessData.$BTV.DriverBT.DistanceCeiling:]</DistanceCeiling>
+								<DestLat>[:$ProcessData.$BTV.DriverBT.DestLat:]</DestLat>
+								<DestLon>[:$ProcessData.$BTV.DriverBT.DestLon:]</DestLon>
+								<ParkTime>[:$ProcessData.$BTV.DriverBT.ParkTime:]</ParkTime>
+								<TodaysPrice>[:$ProcessData.$BTV.DriverBT.TodaysPrice:]</TodaysPrice>
+								<OperatorID>[:$ProcessData.$BTV.DriverBT.OperatorID:]</OperatorID>
+								<PriceSource>T</PriceSource>
+								<Level>2</Level>
+							</offerReservation>	
+						</BTFSInvoke>
+					</Sequence>
+
+					<Sequence repeat="0.." name="CheckInCPALoop">
+						<Wait value="CheckInCPA"/>
+						<BTFSInvoke Name="searchInCPA" wid="BTToTQLWorkflow" Out="DriverBT.TQLResponse" Target="BTTQLBridge.ExecuteDirectQuery.Argument">
+							<searchForParkingInDecisionRangeAll />
+						</BTFSInvoke>
+						<Wait value="SetValues2"/>
+						<Log message="~~~~~~~~~~~~after InDecisionRange~~~~~~~~~~~~~~"/>
+						<BTFSInvoke Name="CalcFeasibility" wid="BTToTQLWorkflow" Out="DriverBT.TQLResponse" Target="BTTQLBridge.ExecuteDirectQuery.Argument">			
+						<offerReservation>
+							<LotID>[:$ProcessData.$BTV.DriverBT.LotID:]</LotID>
+							<SpotID></SpotID>
+							<DriverID>[:$ProcessData.$BTV.DriverBT.DriverID:]</DriverID>
+							<PriceCeiling>[:$ProcessData.$BTV.DriverBT.PriceCeiling:]</PriceCeiling>
+							<DistanceCeiling>[:$ProcessData.$BTV.DriverBT.DistanceCeiling:]</DistanceCeiling>
+							<DestLat>[:$ProcessData.$BTV.DriverBT.DestLat:]</DestLat>
+							<DestLon>[:$ProcessData.$BTV.DriverBT.DestLon:]</DestLon>
+							<ParkTime>[:$ProcessData.$BTV.DriverBT.ParkTime:]</ParkTime>
+							<TodaysPrice>[:$ProcessData.$BTV.DriverBT.TodaysPrice:]</TodaysPrice>
+							<OperatorID>[:$ProcessData.$BTV.DriverBT.OperatorID:]</OperatorID>
+							<PriceSource>T</PriceSource>
+							<Level>3</Level>
+						</offerReservation>										
+						</BTFSInvoke>
+					</Sequence>
+
+	          	</Parallel>
+	        </Behavior>
+      	</BTCode>
+    </reverseBridge>
+    <reverseBridge>
+      <BTCode>
+        <Set wid="driver[:$LocalData.driver:]" target="$START" value=""/>
+      </BTCode>
+    </reverseBridge>
+  </Result>
+</Macro>

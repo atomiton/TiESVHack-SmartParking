@@ -1,0 +1,159 @@
+<Macro name="setDriverTravelInfo">
+	<Argument>
+		<String name="DriverID"/>
+	</Argument>
+	<Result>
+		<selectRandomDestination/>
+		<Log Message="DestinationLat : [:$Response.Message.Value.Lat:]"/>
+		<Log Message="DestinationLon : [:$Response.Message.Value.Lon:]"/>
+		<SetProcessData>
+			<Key>DestinationLat</Key>
+			<Value>[:$Response.Message.Value.Lat:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>DestinationLon</Key>
+			<Value>[:$Response.Message.Value.Lon:]</Value>
+		</SetProcessData>
+		
+		<generateRandomInt>
+			<min>8</min>
+			<max>12</max>
+		</generateRandomInt>
+		<Log Message="Start Time: [:$Response.Message.Value.Rand.Num:]"/>
+		<SetProcessData>
+			<Key>StartTime</Key>
+			<Value>[:$Response.Message.Value.Rand.Num:]</Value>
+		</SetProcessData>
+		
+		<generateRandomInt>
+			<min>1</min>
+			<max>8</max>
+		</generateRandomInt>
+		<Log Message="Parking hours: [:$Response.Message.Value.Rand.Num:]"/>
+		<SetProcessData>
+			<Key>ParkingHour</Key>
+			<Value>[:$Response.Message.Value.Rand.Num:]</Value>
+		</SetProcessData>
+
+		<generateRandomFloat>
+			<min>4</min>
+			<max>6</max>
+		</generateRandomFloat>
+		<Log Message="PriceCeiling: [:$Response.Message.Value.Rand.Num:]"/>
+		<SetProcessData>
+			<Key>PriceCeiling</Key>
+			<Value>[:$Response.Message.Value.Rand.Num:]</Value>
+		</SetProcessData>
+
+		<generateRandomInt>
+			<min>450</min>
+			<max>500</max>
+		</generateRandomInt>
+		<Log Message="DistanceCeiling: [:$Response.Message.Value.Rand.Num:]"/>
+		<SetProcessData>
+			<Key>DistanceCeiling</Key>
+			<Value>[:$Response.Message.Value.Rand.Num:]</Value>
+		</SetProcessData>
+
+		<executeQuery>
+			<QueryString>
+				<Find format="version">
+					<Driver>
+						<DriverID eq="[:$Macro.Argument.DriverID:]" />
+					</Driver>
+				</Find>
+				<SetProcessData>
+					<Key>DriverId</Key>
+					<Value>[:$Response.Message.Value.Find.Result.Driver.DriverID.Value:]</Value>
+				</SetProcessData>
+			</QueryString>
+		</executeQuery>
+		<SetProcessData>
+			<Key>HomeLat</Key>
+			<Value>[:$Response.Message.Value.Find.Result.Driver.HomeLocation.Latitude.Value:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>HomeLon</Key>
+			<Value>[:$Response.Message.Value.Find.Result.Driver.HomeLocation.Longitude.Value:]</Value>
+		</SetProcessData>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverId:]" target="DriverBT.DestLat" value="[:$ProcessData.DestinationLat:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverId:]" target="DriverBT.DestLon" value="[:$ProcessData.DestinationLon:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverId:]" target="DriverBT.StartingTime" value="[:$ProcessData.StartTime:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverId:]" target="DriverBT.ParkTime" value="[:$ProcessData.ParkingHour:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverId:]" target="DriverBT.LotID" value=""/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverId:]" target="DriverBT.ReservedLotID" value=""/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverId:]" target="DriverBT.Position" value="-1"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverId:]" target="DriverBT.InDecisionRange" value="no"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverId:]" target="DriverBT.DecisionMade" value="no"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverId:]" target="DriverBT.PriceCeiling" value="[:$ProcessData.PriceCeiling:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverId:]" target="DriverBT.DistanceCeiling" value="[:$ProcessData.DistanceCeiling:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.OfferingOperator" value=""/>
+			</BTCode>
+		</reverseBridge>
+		<updateDriverDecision>
+			<DriverID>[:$ProcessData.DriverID:]</DriverID>
+			<Decision>false</Decision>
+		</updateDriverDecision>
+		<Log message="1: [:$ProcessData.HomeLat:]" />
+		<Log message="2: [:$ProcessData.HomeLon:]" />
+		<Log message="3: [:$ProcessData.DestinationLat:]" />
+		<Log message="4: [:$ProcessData.DestinationLon:]" />
+		<Log message="5: [:$ProcessData.DriverId:]" />
+		<calcPath>
+			<StartX>[:$ProcessData.HomeLat:]</StartX>
+			<StartY>[:$ProcessData.HomeLon:]</StartY>
+			<EndX>[:$ProcessData.DestinationLat:]</EndX>
+			<EndY>[:$ProcessData.DestinationLon:]</EndY>
+			<DriverID>[:$ProcessData.DriverId:]</DriverID>
+		</calcPath>
+		<decideOperatorApp>
+			<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+		</decideOperatorApp>
+	</Result>
+</Macro>

@@ -1,0 +1,23 @@
+<Macro Name="createDriverOperator">
+	<Argument>
+		<String name="OperatorID"/>
+		<String name="DriverID"/>
+		<Number name="LoyaltyCredit" />
+	</Argument>
+	<Result>
+		<Log Message="Saving createDriverOperator Info..." />
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Save>
+						<DriverOperator>
+							<OperatorID>[:$Macro.Argument.OperatorID:]</OperatorID>
+							<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+							<LoyaltyCredit>[:$Macro.Argument.LoyaltyCredit:]</LoyaltyCredit>
+						</DriverOperator>
+					</Save>
+				</Query>
+			</QueryString>
+		</executeQuery>
+	</Result>
+</Macro>

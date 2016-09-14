@@ -1,0 +1,190 @@
+<Macro name="offerReservationChkAndAssign">
+	<Argument>
+		<String name="LotID"/>
+		<String name="SpotID"/>
+		<String name="DriverID"/>
+		<Number name="DistanceCeiling"/>
+		<Number name="PriceCeiling"/>
+		<String name="DestLat"/>
+		<String name="DestLon"/>
+		<String name="ParkTime"/>
+		<Number name="TodaysPrice"/>
+		<String name="PriceSource"/>
+		<String name="OperatorID"/>
+		<Integer name="Level" />
+		<Number name="LastUtilityFunction" />
+		<Integer name="CurrentVacancies" />
+		<Integer name="OperatorAppValue" />
+	</Argument>
+	<Result>
+		<Log Message="****************** START offerReservation ***************************"/>
+		<Log Message="LotID:===[:$Macro.Argument.LotID:]"/>
+		<Log Message="DriverID:===[:$Macro.Argument.DriverID:]"/>
+		<Log Message="DistanceCeiling:===[:$Macro.Argument.DistanceCeiling:]"/>
+		<Log Message="PriceCeiling:===[:$Macro.Argument.PriceCeiling:]"/>
+		<Log Message="DestLat:===[:$Macro.Argument.DestLat:]"/>
+		<Log Message="DestLon:===[:$Macro.Argument.DestLon:]"/>
+		<Log Message="ParkTime:===[:$Macro.Argument.ParkTime:]"/>
+		<Log Message="TodaysPrice:===[:$Macro.Argument.TodaysPrice:]"/>
+		<Log Message="PriceSource:===[:$Macro.Argument.PriceSource:]"/>
+		<Log Message="CurrentVacancies:===[:$Macro.Argument.CurrentVacancies:]"/>
+		
+		<JavaScript>
+			var currentVacancies = parseInt("[:$Macro.Argument.CurrentVacancies:]");
+			if(currentVacancies.isNaN()) {
+				currentVacancies = 1;
+			}
+			var aoa = Math.min(1, (currentVacancies/100));
+			sffContext.setProcessData("AoA",aoa);
+		</JavaScript>
+		
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<find>
+						<TempReservationRequest>
+							<DriverID eq="[:$Macro.Argument.DriverID:]"/>
+						</TempReservationRequest>
+					</find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		
+		<SetProcessData>
+			<Key>DriverID</Key>
+			<Value>[:$Macro.Argument.DriverID:]</Value>
+		</SetProcessData>
+		
+		<if condition="/[:$Response.Message.Value.Find/count(Result):] eq 0" >
+			<then>
+				<SetProcessData>
+					<Key>LastUtilityFunction</Key>
+					<Value>[:$Macro.Argument.LastUtilityFunction:]</Value>
+				</SetProcessData>
+			</then>
+			<else>
+				<SetProcessData>
+					<Key>LastUtilityFunction</Key>
+					<Value>[:$Response.Message.Value.Find.Result.TempReservationRequest.LastUtilityFunction:]</Value>
+				</SetProcessData>
+			</else>
+		</if>
+		
+		<Log Message="LastUtilityFunction:===[:$ProcessData.LastUtilityFunction:]"/>
+		
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="version">
+						<ParkingLot>
+							<LotID eq="[:$Macro.Argument.LotID:]" />
+						</ParkingLot>
+					</Find>
+					<SetProcessData>
+						<Key>LotLatitude</Key>
+						<Value>[:$Response.Message.Value.Find.Result.ParkingLot.LotLocation.Latitude.Value:]</Value>
+					</SetProcessData>
+					<SetProcessData>
+						<Key>LotLongitude</Key>
+						<Value>[:$Response.Message.Value.Find.Result.ParkingLot.LotLocation.Longitude.Value:]</Value>
+					</SetProcessData>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<Log Message="LotLatitude:===[:$ProcessData.LotLatitude:]"/>
+		<Log Message="LotLongitude:===[:$ProcessData.LotLongitude:]"/>
+		<Log Message="ReservationPrice:===[:$ProcessData.ReservationPrice:]"/>
+		
+		<if condition="/'[:$Macro.Argument.TodaysPrice:]' eq '0E-10'">
+			<then>
+				<SetProcessData>
+					<Key>Price</Key>
+					<Value>0</Value>
+				</SetProcessData>
+			</then>
+			<else>
+				<SetProcessData>
+					<Key>Price</Key>
+					<Value>[:$Macro.Argument.TodaysPrice:]</Value>
+				</SetProcessData>
+			</else>
+		</if>
+		
+			
+		<Log Message="Price========================[:$ProcessData.Price:]"/> 
+		<DelResponseData key="Message.Value.Find" />
+		<Log Message="LastUtilityFunction:===[:$ProcessData.LastUtilityFunction:]"/>
+		<DelResponseData key="Message.Value.Find" />
+		<if condition="/[:$ProcessData.Price:] le [:$Macro.Argument.PriceCeiling:]">
+			<then>
+				<Log Message="DestLat inside if:===[:$Macro.Argument.DestLat:]"/>
+				<Log Message="DestLon inside if:===[:$Macro.Argument.DestLon:]"/>
+				<calculateCoordDistance>
+					<x1>[:$ProcessData.LotLatitude:]</x1>
+					<y1>[:$ProcessData.LotLongitude:]</y1>
+					<x2>[:$Macro.Argument.DestLat:]</x2>
+					<y2>[:$Macro.Argument.DestLon:]</y2>
+				</calculateCoordDistance>
+				<SetProcessData>
+					<Key>Distance</Key>
+					<Value>[:$Response.Message.Value.Result.Distance:]</Value>
+				</SetProcessData>
+				<Log Message="Distance before if :===[:$ProcessData.Distance:]"/>
+				<if condition="/[:$ProcessData.Distance:] le [:$Macro.Argument.DistanceCeiling:]">
+					<then>
+						<Log Message="Distance after if:===[:$ProcessData.Distance:]"/>
+						<Log Message="ParkTime after if:===[:$Macro.Argument.ParkTime:]"/>
+						<executeQuery>
+							<QueryString>
+								<Query>
+									<Find>
+										<DriverOperator>
+											<DriverID eq="[:$Macro.Argument.DriverID:]" />
+											<OperatorID eq="[:$Macro.Argument.OperatorID:]" />
+										</DriverOperator>
+									</Find>
+								</Query>
+							</QueryString>
+						</executeQuery>
+						<JavaScript>
+							var lcVal = parseFloat("[:$Response.Message.Value.Find.Result.DriverOperator.LoyaltyCredit:]");
+							if(lcVal.isNaN()) {
+								lcVal = 0;
+							}
+							sffContext.setProcessData("lvVal", lcVal);
+						</JavaScript>
+						<calculateUtilityValue>
+							<Distance>[:$ProcessData.Distance:]</Distance>
+							<Price>[:$ProcessData.Price:]</Price>
+							<ParkTime>[:$Macro.Argument.ParkTime:]</ParkTime>
+							<Trustworthiness>[:$Macro.Argument.OperatorAppValue:]</Trustworthiness>
+							<LCAVG>[:$ProcessData.lcVal:]</LCAVG>
+							<AoA>[:$ProcessData.AoA:]</AoA>
+						</calculateUtilityValue>
+						<SetProcessData>
+							<Key>CalculatedUtilityValue</Key>
+							<Value>[:$Response.Message.Value.Result.UtilityValue:]</Value>
+						</SetProcessData>
+						<Log Message="CalculatedUtilityValue:===[:$ProcessData.CalculatedUtilityValue:]"/>
+						<if condition="/[:$ProcessData.CalculatedUtilityValue:] gt [:$ProcessData.LastUtilityFunction:]">
+							<then>
+								<Log Message="LastUtilityFunction:===[:$ProcessData.LastUtilityFunction:]"/>
+								<Log Message="Price:===[:$ProcessData.Price:]"/>
+								<setDecisionMade>
+									<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+									<LotID>[:$Macro.Argument.LotID:]</LotID>
+									<SpotID>[:$ProcessData.SpotID:]</SpotID>
+								</setDecisionMade>
+								<SetResponseData>
+									<Key>Message.Value.Result.LastUtilityValue</Key>
+									<Value>[:$ProcessData.CalculatedUtilityValue:]</Value>
+								</SetResponseData>
+							</then>
+						</if>
+					</then>
+				</if>
+			</then>
+		</if>
+		<Log Message="****************** END offerReservation ***************************"/>
+	</Result>
+</Macro>

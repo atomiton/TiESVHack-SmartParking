@@ -1,0 +1,14 @@
+<Def name="Address" >
+	<String name="streetAddress1" />
+	<String name="streetAddres2" />
+	<String name="city" />
+	<String name="state" />
+	<String name="zipCode" />
+	<String name="country" />
+</Def>
+
+<Def name="SpotStatus" >
+	<String name="Vacant" />
+	<String name="Reserved" />
+	<String name="Occupied" />
+</Def>

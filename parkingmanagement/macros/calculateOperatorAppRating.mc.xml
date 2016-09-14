@@ -1,0 +1,68 @@
+<Macro name="calculateOperatorAppRating ">
+	<Argument>
+		<String name="LotID"/>
+	</Argument>
+	<Result>
+		<Log Message="***********Executing calculateOperatorAppRating****************"/>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<find>
+   						<Driver>
+     						<ID ne=""/>
+						</Driver>
+					</find>
+					<SetProcessData>
+						<Key>count</Key>
+						<Value>[:$Response.Message.Value.Find/count(Result):]</Value>
+					</SetProcessData>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find>
+						<OperatorApp>
+							<LotID eq="[:$Macro.Argument.LotID:]" />
+						</OperatorApp>
+					</Find>
+
+					<SetProcessData>
+						<Key>OperatorAppValue</Key>
+						<Value>[:$Response.Message.Value.Find.Result.OperatorApp.OperatorAppValue:]</Value>
+					</SetProcessData>
+
+					<JavaScript>
+							var operatorAppValue = 0;
+							if("[:$ProcessData.OperatorAppValue:]" != '0E-10') {
+								operatorAppValue = parseFloat("[:$ProcessData.OperatorAppValue:]");
+							}
+							var count = parseInt("[:$ProcessData.count:]");
+							sffLog.info("count  ======" + count );
+							var operatorAppRating =parseFloat (operatorAppValue / Math.sqrt(count));
+							sffLog.info("operatorAppRating  ======" + operatorAppRating );
+							sffContext.setLocalData("OperatorAppRating",operatorAppRating);
+					</JavaScript>	
+
+					<SetProcessData>
+							<Key>OperatorAppRating</Key>
+							<Value>[:$LocalData.OperatorAppRating:]</Value>
+					</SetProcessData>
+				
+					<SetResponseData>
+							<Key>Message.Value.Find.Result.OperatorApp.AppRating.Value</Key>
+							<Value>[:$ProcessData.OperatorAppRating:]</Value>
+					</SetResponseData>
+				
+					<Update>
+							<from>Result</from>
+							<Include>$Response.Message.Value.Find</Include>
+					</Update>
+
+				</Query>
+			</QueryString>
+		</executeQuery>
+
+	</Result>
+</Macro>

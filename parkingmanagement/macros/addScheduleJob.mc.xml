@@ -1,0 +1,26 @@
+<Macro Name="ScheduleJob">
+    <Argument>
+        <ScheduleInterval></ScheduleInterval>
+        <StartTime>0</StartTime>
+        <EndTime></EndTime>     
+        <ActionCode></ActionCode>
+        <Name></Name>
+    </Argument>
+    <Result>
+        <DoRequest target="[:RuntimeParams.TQLStudio_SequenceFacetIDName:]">
+            <Process Return="CMD_NOP">
+                <Message>
+                    <Value>
+                        <Execute eid="[:$Macro.Argument.Name:]" schedule="[[:$Macro.Argument.StartTime:]..[:$Macro.Argument.EndTime:]/[:$Macro.Argument.ScheduleInterval:]]" >
+                            <Action>
+                                <ExecuteQuery><QueryString>
+                                [:$Macro.Argument.ActionCode:]
+                                </QueryString></ExecuteQuery>
+                            </Action>
+                        </Execute>
+                    </Value>
+                </Message>
+            </Process>
+        </DoRequest>
+    </Result>
+</Macro>

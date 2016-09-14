@@ -1,0 +1,25 @@
+<Macro Name="addParkingSpot">
+	<Argument>
+		<String name="LotID"/>
+	</Argument>
+	<Result>
+		<Log Message="Saving Driver Info..." />
+		<SetLocalData>
+			<Key>lotId</Key>
+			<Value>[:$Macro.Argument.LotID:]</Value>
+		</SetLocalData>
+		<JavaScript>
+			for(var i=1; i &lt;101; i++){
+				var spotId = ("[:$LocalData.lotId:]"+"-Spot-"+i);
+				sffContext.setContextData("SpotId", spotId);
+
+				var setContextData = ListMap.static.newInstance();   
+				var rc = setContextData.instanceAdd("createParkingSpot");
+				rc.put("SpotId",spotId);
+				rc.put("LotID","[:$LocalData.lotId:]");
+				sffLog.info(setContextData);
+				setContextData;
+			}
+		</JavaScript>
+	</Result>
+</Macro>

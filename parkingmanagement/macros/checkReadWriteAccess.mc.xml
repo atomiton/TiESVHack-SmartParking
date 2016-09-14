@@ -1,0 +1,97 @@
+<Macro name="checkReadWriteAccess">
+	<Argument>
+		<String name="LotID"/>
+		<String name="OperatorID"/>
+	</Argument>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="version">
+						<ParkingLot>
+							<LotID eq="[:$Macro.Argument.LotID:]" />
+						</ParkingLot>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		
+		<If condition="/'[:$Response.Message.Value.Find/count(Result):]' ne 0">
+			<then>
+				<SetProcessData>
+					<Key>LotId</Key>
+					<Value>[:$Response.Message.Value.Find.Result.ParkingLot.ID:]</Value>
+				</SetProcessData>
+				<executeQuery>
+					<QueryString>
+						<Query>
+							<Find format="version">
+								<ParkingLotIds>
+									<LotID eq="[:$ProcessData.LotId:]" />
+								</ParkingLotIds>
+							</Find>
+						</Query>
+					</QueryString>
+				</executeQuery>
+				
+				<If condition="/'[:$Response.Message.Value.Find/count(Result):]' ne 0">
+					<then>
+						<SetProcessData>
+							<Key>ParkingLotID</Key>
+							<Value>[:$Response.Message.Value.Find.Result.ParkingLot.ID:]</Value>
+						</SetProcessData>
+						<executeQuery>
+							<QueryString>
+								<Query>
+									<Find format="version">
+										<ParkingLotMappings>
+											<ParkingLotID eq="[:$ProcessData.ParkingLotID:]" />
+											<DeveloperID eq="[:$Macro.Argument.OperatorID:]" />
+										</ParkingLotMappings>
+									</Find>
+								</Query>
+							</QueryString>
+						</executeQuery>
+					
+						<If condition="/'[:$Response.Message.Value.Find/count(Result):]' ne 0">
+							<then>
+								<If condition="/'[:$Response.Message.Value.Find.Result.ParkingLotMappings.AccessType.Value:]' eq 'ReadWrite'">
+									<then>
+										<SetResponseData>
+											<Key>Message.Value.Result.Access</Key>
+											<Value>true</Value>
+										</SetResponseData>
+									</then>
+									<else>
+										<SetResponseData>
+											<Key>Message.Value.Result.Access</Key>
+											<Value>false</Value>
+										</SetResponseData>
+									</else>
+								</If>
+							</then>
+							<else>
+								<SetResponseData>
+									<Key>Message.Value.Result.Access</Key>
+									<Value>false</Value>
+								</SetResponseData>
+							</else>
+						</If>
+					</then>
+					<else>
+						<SetResponseData>
+							<Key>Message.Value.Result.Access</Key>
+							<Value>false</Value>
+						</SetResponseData>
+					</else>
+				</If>
+			</then>
+			<else>
+				<SetResponseData>
+					<Key>Message.Value.Result.Access</Key>
+					<Value>false</Value>
+				</SetResponseData>
+			</else>
+		</If>
+	</Result>
+</Macro>

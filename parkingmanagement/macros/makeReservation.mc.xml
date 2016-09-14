@@ -1,0 +1,65 @@
+<Macro name="makeReservation">
+	<Argument>
+		<String name="DriverID"/>
+		<String name="LotID"/>
+		<String name="SpotID"/>
+	</Argument>
+	<Result>
+		<Log Message="Driver DriverID::::::::=====> [:$Macro.Argument.DriverID:]"/>
+		<SetProcessData>
+			<Key>DriverID</Key>
+			<Value>[:$Macro.Argument.DriverID:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>LotID</Key>
+			<Value>[:$Macro.Argument.LotID:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>SpotID</Key>
+			<Value>[:$Macro.Argument.SpotID:]</Value>
+		</SetProcessData>
+		<!-- <DelResponseData key="Message.Value.Find" />
+		<DelResponseData key="Message.Value.Update" /> -->
+		<Log Message="Driver LotID::::::::=====> [:$Macro.Argument.LotID:]"/>
+		<Log Message="Driver SpotID::::::::=====> [:$Macro.Argument.SpotID:]"/>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="version">
+						<ReservationRequests>
+							<LotID eq="[:$ProcessData.LotID:]" />
+						</ReservationRequests>
+					</Find>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.ReservationRequests.SpotID.Value</Key>
+						<Value>[:$ProcessData.SpotID:]</Value>
+					</SetResponseData>
+					<Log Message="ReservationRequests SpotID:::::::: =====> [:$Response.Message.Value.Find.Result.ReservationRequests.SpotID.Value:]"/>
+					<Update>
+						<from>Result</from>
+						<Include>$Response.Message.Value.Find</Include>
+					</Update>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverID:]" target="DriverBT.ReservedLotID" value="[:$ProcessData.LotID:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverID:]" target="DriverBT.SpotID" value="[:$ProcessData.SpotID:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverID:]" target="DriverBT.DecisionMade" value="yes"/>
+			</BTCode>
+		</reverseBridge>
+		<updateDriverDecision>
+			<DriverID>[:$ProcessData.DriverID:]</DriverID>
+			<Decision>true</Decision>
+		</updateDriverDecision>
+	</Result>
+</Macro>

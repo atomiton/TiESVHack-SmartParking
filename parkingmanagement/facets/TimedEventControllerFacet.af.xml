@@ -1,0 +1,76 @@
+<AppFacet name="TimedEventControllerFacet">
+	<String name="Status" knownBy="TickTock"/>
+	
+	<Action name="TickTock" >
+		<Workflow Limit="1" Live="1" Timeout="-1">
+			<Task name="Main" while="true">
+				<Event name="Argument" as="ActionArgument" />
+				<Invoke name="ManageEvents" waitFor="Argument">
+					<FacetScript>
+						<Log message="****** Subscribing to Clock ***********" />
+						<SubscribeToTQL TopicName="TQL.Update.parkingmanagement.management.VirtualClock.Hour.*" TopicId="[:RuntimeParams.TQLStudio_TopicFacetIDName:]TimedControl">
+							<ActionName>
+								<Log message="Known: [:$Request.Message.Value.Publish.Value:]" />
+								<SetProcessData>
+									<Key>Hour</Key>
+									<Value>[:$Request.Message.Value.Publish.Value:]</Value>
+								</SetProcessData>
+								<reduceParkedTime />
+								<executeQuery>
+									<QueryString>
+										<Find format="version">
+											<Driver>
+												<ID ne="" />
+											</Driver>
+										</Find>
+									</QueryString>
+								</executeQuery>
+								<If condition="/[:$ProcessData.Hour:] eq 0">
+									<then>
+										<executeQuery>
+											<QueryString>
+												<DeleteAll>
+													<ReservationRequests>
+														<ID ne="" />
+													</ReservationRequests>
+												</DeleteAll>
+											</QueryString>
+										</executeQuery>
+									</then>
+								</If>
+								<If condition="/[:$ProcessData.Hour:] eq 8">
+									<then>
+										<updatePriceForAllApps />
+									</then>
+								</If>
+								<If condition="/[:$ProcessData.Hour:] eq 1">
+									<then>
+										<setDriverTravelInfoAll />
+									</then>
+								</If>
+								<For each="drivers" in="Find.Result.Driver" using="$ProcessData" >
+									<reverseBridge>
+										<BTCode>
+											<Set wid="driver[:$ProcessData.drivers.DriverId.Value:]" target="DriverBT.HourPassed" value="1"/>
+										</BTCode>
+									</reverseBridge>
+									<reverseBridge>
+										<BTCode>
+											<Set wid="driver[:$ProcessData.drivers.DriverId.Value:]" target="DriverBT.Hour" value="[:$ProcessData.Hour:]"/>
+										</BTCode>
+									</reverseBridge>
+									<reverseBridge>
+										<BTCode>
+											<Set wid="driver[:$ProcessData.drivers.DriverId.Value:]" target="DriverBT.Print" value="1"/>
+										</BTCode>
+									</reverseBridge>
+								</For>
+							</ActionName>
+						</SubscribeToTQL>
+						
+					</FacetScript>
+				</Invoke>
+			</Task>
+		</Workflow>
+	</Action>
+</AppFacet>

@@ -1,0 +1,23 @@
+<DeleteAll>
+	<TimedEventController>
+		<Id ne="" />
+	</TimedEventController>
+</DeleteAll>
+<Create>
+    <TimedEventController>
+        <Status>Running</Status>
+    </TimedEventController>
+</Create>
+
+<DeleteAll>
+	<DriverController>
+		<Id ne="" />
+	</DriverController>
+</DeleteAll>
+<Create>
+    <DriverController>
+        <Status>Running</Status>
+    </DriverController>
+</Create>
+
+<VirtualClockTicker />

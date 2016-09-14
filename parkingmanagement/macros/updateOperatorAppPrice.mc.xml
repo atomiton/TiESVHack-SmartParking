@@ -1,0 +1,72 @@
+<Macro name="updateOperatorAppPrice">
+	<Argument>
+		<String name="OperatorID" />
+		<String name="LotID1" />
+        <String name="LotID2" />
+		<Number name="LotOnePrice" />
+		<Number name="LotTwoPrice" />
+	</Argument>
+	<Result>
+		<SetProcessData>
+			<Key>LotOnePrice</Key>
+			<Value>[:$Macro.Argument.LotOnePrice:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>LotTwoPrice</Key>
+			<Value>[:$Macro.Argument.LotTwoPrice:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>LotID1</Key>
+			<Value>[:$Macro.Argument.LotID1:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>LotID2</Key>
+			<Value>[:$Macro.Argument.LotID2:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>OperatorID</Key>
+			<Value>[:$Macro.Argument.OperatorID:]</Value>
+		</SetProcessData>
+		<executeQuery>
+			<QueryString>
+				<Query>	
+					<Find format="current,version">
+						<OperatorApp>
+							<OperatorID eq="[:$ProcessData.OperatorID:]" />
+							<LotID eq="[:$ProcessData.LotID1:]" />
+						</OperatorApp>
+					</Find>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.OperatorApp.TodaysPrice.Value</Key>
+						<Value>[:$ProcessData.LotOnePrice:]</Value>
+					</SetResponseData>
+					<Update>
+						<from>Result</from>
+						<Include>$Response.Message.Value.Find</Include>
+					</Update>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<executeQuery>
+			<QueryString>
+				<Query>	
+					<Find format="current,version">
+						<OperatorApp>
+							<OperatorID eq="[:$ProcessData.OperatorID:]" />
+							<LotID eq="[:$ProcessData.LotID2:]" />
+						</OperatorApp>
+					</Find>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.OperatorApp.TodaysPrice.Value</Key>
+						<Value>[:$ProcessData.LotTwoPrice:]</Value>
+					</SetResponseData>
+					<Update>
+						<from>Result</from>
+						<Include>$Response.Message.Value.Find</Include>
+					</Update>
+				</Query>
+			</QueryString>
+		</executeQuery>		
+		<DelResponseData key="Message.Value.Find" />
+	</Result>
+</Macro>

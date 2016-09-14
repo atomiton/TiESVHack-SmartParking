@@ -1,0 +1,117 @@
+<Macro name="offerReservationAll">
+	<Argument>
+		<DriverID></DriverID>
+		<PriceCeiling></PriceCeiling>
+		<DistanceCeiling></DistanceCeiling>
+		<DestLat></DestLat>
+		<DestLon></DestLon>
+		<CurrLat></CurrLat>
+		<CurrLon></CurrLon>
+		<ParkTime></ParkTime>
+		<OperatorAppID1></OperatorAppID1>
+		<OperatorAppID2></OperatorAppID2>
+		<OperatorAppID3></OperatorAppID3>
+		<PriceSource></PriceSource>
+		<OperatorID></OperatorID>
+		<LotID></LotID>
+		<TodaysPrice></TodaysPrice>
+		<CurrentVacancies></CurrentVacancies>
+		<OperatorAppValue></OperatorAppValue>
+	</Argument>
+	<Result>
+		<Log message="***************** CHECKING AT LEVEL 1 (offerReservationAll)*******************************" />
+		<executeQuery>
+			<QueryString>
+				<Find format="version">
+					<Driver>
+						<DriverID eq="[:$Macro.Argument.DriverID:]" />
+					</Driver>
+				</Find>
+			</QueryString>
+		</executeQuery>
+		<SetProcessData>
+			<Key>LastUtilityFunction</Key>
+			<Value>[:$Response.Message.Value.Find.Result.Driver.LastUtilityFunction.Value:]</Value>
+		</SetProcessData>
+		
+		<JavaScript>
+			var appId1 = "[:$Macro.Argument.OperatorAppID1:]";
+			var appId2 = "[:$Macro.Argument.OperatorAppID2:]";
+			var appId3 = "[:$Macro.Argument.OperatorAppID3:]";
+			var appId = "[:$Macro.Argument.OperatorID:]";
+			
+			if(appId == appId1 || appId == appId2 || appId == appId3) {
+				sffContext.setProcessData("isMyApp", true);
+			} else {
+				sffContext.setProcessData("isMyApp", false);
+			}
+		</JavaScript>
+		
+		<if condition="/'[:$ProcessData.isMyApp:]' eq 'true'">
+			<then>
+				<offerReservation>
+					<LotID>[:$Macro.Argument.LotID:]</LotID>
+					<SpotID></SpotID>
+					<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+					<DistanceCeiling>[:$Macro.Argument.DistanceCeiling:]</DistanceCeiling>
+					<PriceCeiling>[:$Macro.Argument.PriceCeiling:]</PriceCeiling>
+					<DestLat>[:$Macro.Argument.DestLat:]</DestLat>
+					<DestLon>[:$Macro.Argument.DestLon:]</DestLon>
+					<ParkTime>[:$Macro.Argument.ParkTime:]</ParkTime>
+					<TodaysPrice>[:$Macro.Argument.TodaysPrice:]</TodaysPrice>
+					<PriceSource>[:$Macro.Argument.PriceSource:]</PriceSource>
+					<OperatorID>[:$Macro.Argument.OperatorID:]</OperatorID>
+					<LastUtilityFunction>[:$ProcessData.LastUtilityFunction:]</LastUtilityFunction>
+					<CurrentVacancies>[:$Macro.Argument.CurrentVacancies:]</CurrentVacancies>
+				</offerReservation>
+				<Log message="Utility Value: [:$Response.Message.Value.Result.LastUtilityValue:]" />
+			
+				<executeQuery>
+					<QueryString>
+						<Find>
+							<TempReservationRequest>
+								<DriverID eq="[:$ProcessData.DriverID:]" />
+							</TempReservationRequest>
+						</Find>
+					</QueryString>
+				</executeQuery>
+				
+				<If condition="/'[:$Response.Message.Value.Find/count(Result):]' ne 0">
+					<then>
+						<Log message="*****************  FOUND AT LEVEL 1 (offerReservationAll) *******************************" />
+						<SetProcessData>
+							<Key>LastU</Key>
+							<Value>[:$Response.Message.Value.Find.Result.TempReservationRequest.LastUtilityFunction:]</Value>
+						</SetProcessData>
+						<reservationRequest>
+							<DriverID>[:$Response.Message.Value.Find.Result.TempReservationRequest.DriverID:]</DriverID>
+							<LotID>[:$Response.Message.Value.Find.Result.TempReservationRequest.LotID:]</LotID>
+							<OperatorID>[:$Response.Message.Value.Find.Result.TempReservationRequest.OperatorID:]</OperatorID>
+							<DriverResponse>true</DriverResponse>
+							<Price>[:$Response.Message.Value.Find.Result.TempReservationRequest.ReservationPrice:]</Price>
+						</reservationRequest>
+						<executeQuery>
+							<QueryString>
+								<Find format="current,version">
+									<Driver>
+										<DriverID eq="[:$ProcessData.DriverID:]" />
+									</Driver>
+								</Find>
+								<SetResponseData>
+									<Key>Message.Value.Find.Result.Driver.LastUtilityFunction.Value</Key>
+									<Value>[:$ProcessData.LastU:]</Value>
+								</SetResponseData>
+								<Update>
+									<from>Result</from>
+									<Include>$Response.Message.Value.Find</Include>
+								</Update>
+							</QueryString>
+						</executeQuery>
+					</then>
+				</If>
+			</then>
+		</if>
+		
+		
+	</Result>
+</Macro>

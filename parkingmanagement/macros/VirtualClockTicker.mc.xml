@@ -1,0 +1,92 @@
+<Macro name="VirtualClockTicker">
+	<Argument/>
+
+	<Result>
+			<executeQuery>
+				<QueryString>
+					<Query>
+						<DeleteAll>
+							<VirtualClock>
+								<Id ne=""/>
+							</VirtualClock>
+						</DeleteAll>
+						<Create>
+							<VirtualClock>
+								<Date>2012-11-30T08:05:02Z</Date>
+								<Hour>22</Hour>
+								<Days>0</Days>
+							</VirtualClock>
+						</Create>
+					</Query>
+				</QueryString>
+			</executeQuery>
+			
+			<ScheduleJob>
+			<Name>VirtualClockTicker</Name>
+			<ScheduleInterval>2sec</ScheduleInterval>
+			<ActionCode>
+				<executeQuery>
+				<QueryString>
+					<Query>
+						<Find format="current,version">
+							<VirtualClock>
+								<Id ne=""/>
+							</VirtualClock>
+						</Find>
+						<if condition="/[:$Response.Message.Value.Find.Result.VirtualClock.Days.Value:] eq 90">
+							<then>
+								<DeleteScheduleJob>
+									<JobName>VirtualClockTicker</JobName>
+								</DeleteScheduleJob>
+							</then>
+							<else>
+								<JavaScript>
+									var hour = parseInt("[:$Response.Message.Value.Find.Result.VirtualClock.Hour.Value:]");
+									var days = parseInt("[:$Response.Message.Value.Find.Result.VirtualClock.Days.Value:]");
+									var currentDate = "[:$Response.Message.Value.Find.Result.VirtualClock.Date.Value:]";
+									hour = ((hour+1)%24);
+									if(hour == 0) {
+										days = days+1;
+										sffLog.info("currentDate: " + currentDate);
+										var date = parseInt(currentDate);
+										sffLog.info("Date: " + date);
+										date = date + 86400000;
+										sffLog.info("Date: " + date);
+										sffLog.info("Date: " + new Date(date));							
+										sffContext.setLocalData("currentDate", date);
+										sffContext.setLocalData("days", days);
+									} else {
+										var date = parseInt(currentDate);
+										sffContext.setLocalData("currentDate", date);
+										sffContext.setLocalData("days", days);
+									}
+									sffLog.info("Hour: " + hour);
+									sffLog.info("CurrentDate: " + currentDate);
+									sffContext.setLocalData("hour",hour);
+								</JavaScript>
+								<SetResponseData>
+									<Key>Message.Value.Find.Result.VirtualClock.Hour.Value</Key>
+									<Value>[:$LocalData.hour:]</Value>
+								</SetResponseData>
+								<SetResponseData>
+									<Key>Message.Value.Find.Result.VirtualClock.Date.Value</Key>
+									<Value>[:$LocalData.currentDate:]</Value>
+								</SetResponseData>
+								<SetResponseData>
+									<Key>Message.Value.Find.Result.VirtualClock.Days.Value</Key>
+									<Value>[:$LocalData.days:]</Value>
+								</SetResponseData>
+								<Update>
+									<from>Result</from>
+									<Include>$Response.Message.Value.Find</Include>
+								</Update>
+							</else>
+						</if>
+						
+					</Query>
+				</QueryString>
+			</executeQuery>
+			</ActionCode>
+		</ScheduleJob>
+	</Result>
+</Macro>

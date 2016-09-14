@@ -1,0 +1,48 @@
+<Macro name="findNearestFreeParking">
+	<Argument>
+		<DriverID />
+		<CurrLat />
+		<CurrLon />
+	</Argument>
+	
+	<Result>
+	
+		<Log message="Inside: findNearestFreeParking" />
+		<getLotsSortedByDist>
+			<CurrLat>[:$Macro.Argument.CurrLat:]</CurrLat>
+			<CurrLon>[:$Macro.Argument.CurrLon:]</CurrLon>
+		</getLotsSortedByDist>
+		<Log message="Output: [:$Response.Message.Value:]" />
+		<Log message="Lot ID: [:$Response.Message.Value.Result.Lot.ID:]" />
+		<SetProcessData>
+			<Key>LotID</Key>
+			<Value>[:$Response.Message.Value.Result.Lot.ID:]</Value>
+		</SetProcessData>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<find>
+						<ParkingSpot>
+							<LotID eq="[:$ProcessData.LotID:]"/>
+							<SpotStatus eq="Available"/>
+						</ParkingSpot>
+					</find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<If coundition="/[:$Response.Message.Value.Find/count(Result):] gt 0">
+			<then>
+				<SetProcessData>
+					<Key>SpotID</Key>
+					<Value>[:$Response.Message.Value.Find.Result.ParkingSpot.SpotID:]</Value>
+				 </SetProcessData>
+			</then>
+		</If>
+		<Log message="O/P: [:$ProcessData.SpotID:]" />
+		<setDecisionMade>
+			<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+			<LotID>[:$ProcessData.LotID:]</LotID>
+			<SpotID>[:$ProcessData.SpotID:]</SpotID>
+		</setDecisionMade>
+	</Result>
+</Macro>

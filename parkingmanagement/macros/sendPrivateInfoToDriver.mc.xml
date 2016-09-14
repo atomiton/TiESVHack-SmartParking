@@ -1,0 +1,71 @@
+<Macro name="sendPrivateInfoToDriver">
+	<Argument>
+		<String name="DriverID"/>
+		<String name="LotID"/>
+		<String name="SpotID"/>
+		<Number name="OfferedPrice"/>
+		<Number name="OperatorID"/>
+	</Argument>
+	<Result>
+		<checkReadAccess>
+			<LotID>[:$Macro.Argument.LotID:]</LotID>
+			<OperatorID>[:$Macro.Argument.OperatorID:]</OperatorID>
+		</checkReadAccess>
+		<If condition="/'[:$Response.Message.Value.Result.Access:]' eq 'true'">
+			<then>
+				<executeQuery>
+					<QueryString>
+						<Find format="current,version">
+							<OperatorApp>
+								<LotID eq="[:$Macro.Argument.LotID:]" />
+							</OperatorApp>
+						</Find>
+					</QueryString>
+				</executeQuery>
+				<JavaScript>
+					var operAppValue = parseFloat("[:$Response.Message.Value.Find.Result.OperatorApp.OperatorAppValue.Value:]");
+					if(operAppValue.isNaN()) {
+						operAppValue = 0;
+					}
+					var appValue = operAppValue*1.5;
+					sffContext.setProcessData("appValue",appValue);
+				</JavaScript>
+				<reverseBridge>
+					<BTCode>
+						<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.DriverID" value="[:$Macro.Argument.DriverID:]"/>
+					</BTCode>
+				</reverseBridge>
+				<reverseBridge>
+					<BTCode>
+						<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.OfferedLotID" value="[:$Macro.Argument.LotID:]"/>
+					</BTCode>
+				</reverseBridge>
+				<reverseBridge>
+					<BTCode>
+						<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.SpotID" value="[:$Macro.Argument.SpotID:]"/>
+					</BTCode>
+				</reverseBridge>
+				<reverseBridge>
+					<BTCode>
+						<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.OfferedPrice" value="[:$Macro.Argument.OfferedPrice:]"/>
+					</BTCode>
+				</reverseBridge>
+				<reverseBridge>
+					<BTCode>
+						<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.OperatorAppValue" value="[:$Process.appValue:]"/>
+					</BTCode>
+				</reverseBridge>
+				<reverseBridge>
+					<BTCode>
+						<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.OfferingOperator" value="[:$Macro.Argument.OperatorID:]"/>
+					</BTCode>
+				</reverseBridge>
+				<reverseBridge>
+					<BTCode>
+						<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.PrivateInfoToDriver" value="1"/>
+					</BTCode>
+				</reverseBridge>
+			</then>
+		</If>
+	</Result>
+</Macro>

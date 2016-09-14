@@ -1,0 +1,30 @@
+<AppFacet name="CSVLoader">
+	<String name="destModelName" />
+	<String name="DriverId" />
+ 	<String name="ParkingLotId" />
+	<String name="fileName" KnownBy="csvLoaderAc" Update="auto" />
+	<Action name="csvLoaderAc" documentation="Data Facet to load CSV Data">
+		<Workflow Limit="1" Live="1" Timeout="-1">
+			<Task name="Main">
+				<Event name="Argument" as="ActionArgument" />
+				
+				<Invoke name="CSVDataLoader" waitFor="Argument">
+					<FacetScript>
+						<Log Message="Loading file..."/>
+						<LoadFromCSV fileName="[%:Event.Argument.fileName.Value:%]" 
+									 destModelName="[%:Event.Argument.destModelName.Value:%]"
+									 DriverId="[%:Event.Argument.DriverId.Value:%]"
+									 ParkingLotId="[%:Event.Argument.ParkingLotId.Value:%]" />
+						<Log Message="Loading complete!!!"/>
+					</FacetScript>
+				</Invoke>
+				<Output name="ActionResult">
+					<Value>
+						<Log Message="Output file name: [%:Event.Argument.fileName.Value:%]"/>
+						<fileName>[%:Event.Argument.fileName.Value:%]</fileName>
+					</Value>
+				</Output>
+			</Task>
+		</Workflow>
+	</Action>
+</AppFacet>

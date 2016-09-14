@@ -1,0 +1,41 @@
+<Macro Name="parkingLotOptionInitBT">
+  <Argument>
+	<String name="ParkingLotOptionID" />
+  </Argument>
+  <Result>
+	<SetLocalData>
+		<Key>parkingLotOptionID</Key>
+		<Value>[:$Macro.Argument.ParkingLotOptionID:]</Value>
+	</SetLocalData>
+    <reverseBridge>
+      <BTCode>
+        <Behavior name="ParkLotOptionBT" wid="pakrkingLotOption[:$LocalData.parkingLotOptionID:]">
+			<Event name="HourPassed"/>
+			<Var name="DriverID" default="[:$LocalData.driver:]" />
+			<Var name="TQLResponse"/>
+			
+			<Var name="AssuranceOfAvailability"/>
+			<Var name="Distance" />
+			<Var name="Trustworthiness"/>
+			<Var name="Price"/>
+			<Var name="LastUtilityFunction"/>	
+			
+          <Parallel repeat="0.." name="DriverParallel">
+			
+			<Sequence repeat="0.." name="PrintLoop">
+				<Wait value="Print"/>
+				<Log message="(Driver): Behavior:[:Behavior.wid:], DriverId:[:DriverBT.DriverID:]"/>
+			</Sequence>
+			
+		
+          </Parallel>
+        </Behavior>
+      </BTCode>
+    </reverseBridge>
+    <reverseBridge>
+      <BTCode>
+        <Set wid="wSpTapCondition[:$LocalData.SpId:]" target="$START" value=""/>
+      </BTCode>
+    </reverseBridge>
+  </Result>
+</Macro>

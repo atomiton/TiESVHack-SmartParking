@@ -1,0 +1,46 @@
+<Macro name="parkVehicle">
+	<Argument>
+		<DriverID></DriverID>
+		<SpotID></SpotID>
+		<DistanceCeiling></DistanceCeiling>
+		<PriceCeiling></PriceCeiling>
+		<ParkTime></ParkTime>
+		<ReservedLotID></ReservedLotID>
+	</Argument>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="current">
+						<ReservationRequests>
+							<DriverID eq="[:$Macro.Argument.DriverID:]"/>
+							<LotID eq="[:$ProcessData.ReservedLotID:]" />
+						</ReservationRequests>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<SetProcessData>
+			<Key>HourlyPrice</Key>
+			<Value>[:$Response.Message.Value.Find.Result.ReservationRequests.ReservationPrice:]</Value>
+		</SetProcessData>
+	
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="current">
+						<ParkingLotOption>
+							<LotID eq="[:$ProcessData.ReservedLotID:]" />
+						</ParkingLotOption>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<calculateSatisfaction>
+			<HourlyPrice>[:$Response.Message.Value.Find.Result.ReservationRequests.ReservationPrice:]</HourlyPrice>
+			<PriceCeiling>[:$Macro.Argument.PriceCeiling:]</PriceCeiling>
+			<ActualDistance></ActualDistance>
+			<DistanceCeiling></DistanceCeiling>
+		</calculateSatisfaction>
+	</Result>
+</Macro>

@@ -1,0 +1,30 @@
+<Macro name="setDecisionMade">
+	<Argument>
+		<DriverID />
+		<LotID />
+		<SpotID />
+	</Argument>
+	
+	<Result>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.ReservedLotID" value="[:$ProcessData.LotID:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.LotID" value="[:$ProcessData.LotID:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.SpotID" value="[:$ProcessData.SpotID:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.DecisionMade" value="yes"/>
+			</BTCode>
+		</reverseBridge>
+	</Result>
+</Macro>

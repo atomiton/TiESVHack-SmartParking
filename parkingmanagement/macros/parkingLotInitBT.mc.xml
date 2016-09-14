@@ -1,0 +1,53 @@
+<Macro Name="parkingLotInitBT">
+  <Argument>
+	<String name="LotID" />
+	<Boolean name="OperatingStatus" />
+  <Boolean name="SpotStatus" />
+  <Time name="SpotOccupiedSince" />
+  <Number name="DayPrice" />
+  <Number name="LotVacancy" />
+  <String name="Reputation" />
+  <Number name="DayRevenue" />
+  <Number name="ReservationRevenue" />
+  <Number name="TotalRevenue" />
+  </Argument>
+  <Result>
+	<SetLocalData>
+		<Key>parkingLot</Key>
+		<Value>[:$Macro.Argument.LotID:]</Value>
+	</SetLocalData>
+    <reverseBridge>
+      <BTCode>
+        <Behavior name="ParkingLotBT" wid="parkingLot[:$LocalData.parkingLot:]">
+    			<Event name="HourPassed"/>
+          <Event name="Print" />
+
+    			<Var name="LotID" default="[:$LocalData.parkingLot:]" />
+    			<Var name="TQLResponse"/>
+    			<Var name="OperatingStatus" />
+    			<Var name="SpotStatus" />
+    			<Var name="SpotOccupiedSince" />
+    			<Var name="DayPrice" />
+    			<Var name="LotVacancy" />
+    			<Var name="Reputation" />
+    			<Var name="DayRevenue" />
+          <Var name="ReservationRevenue" />
+    			<Var name="TotalRevenue" />
+
+          <Parallel repeat="0.." name="ParkingLotParallel">
+			
+      			<Sequence repeat="0.." name="PrintLoop">
+      				<Wait value="Print"/>
+      				<Log message="(ParkingLot): Behavior:[:Behavior.wid:], LotID:[:ParkingLotBT.LotID:]"/>
+      			</Sequence>
+          </Parallel>
+        </Behavior>
+      </BTCode>
+    </reverseBridge>
+    <reverseBridge>
+      <BTCode>
+        <Set wid="parkingLot[:$LocalData.parkingLot:]" target="$START" value=""/>
+      </BTCode>
+    </reverseBridge>
+  </Result>
+</Macro>

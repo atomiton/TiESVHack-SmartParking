@@ -1,0 +1,37 @@
+<Macro Name="UpdateParkedTime">
+	<Argument>
+		<SpotID></SpotID>
+		<Hour></Hour>
+		<Status></Status>
+	</Argument>
+	<Result>
+		<Log Message="Saving UpdateParkedTime Info..." />
+		<Log Message="SpotID: [:$Macro.Argument.SpotID:]" />
+		<Log Message="Hour: [:$Macro.Argument.Hour:]" />
+		<Log Message="Status: [:$Macro.Argument.Status:]" />
+		
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="current,version">
+						<ParkingSpot>
+							<SpotID eq="[:$Macro.Argument.SpotID:]" />
+						</ParkingSpot>
+					</Find>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.ParkingSpot.HourToEmpty.Value</Key>
+						<Value>[:$Macro.Argument.Hour:]</Value>
+					</SetResponseData>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.ParkingSpot.SpotStatus.Value</Key>
+						<Value>[:$Macro.Argument.Status:]</Value>
+					</SetResponseData>
+					<Update>
+						<from>Result</from>
+						<Include>$Response.Message.Value.Find</Include>
+					</Update>
+				</Query>
+			</QueryString>
+		</executeQuery>
+	</Result>
+</Macro>

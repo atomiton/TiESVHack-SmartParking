@@ -1,0 +1,45 @@
+<Macro Name="createDriverTravelInfo">
+	<Argument>
+		<String name="OperatorAppID"/>
+		<String name="DriverID"/>
+		<Number name="DestLatitude"/>
+		<Number name="DestLongitude"/>
+		<Time name="TimeParked"/>
+		<Number name="CurrLatitude"/>
+		<Number name="CurrLongitude"/>
+		<Integer name="StartTime" />
+	</Argument>
+	<Result>
+		<Log Message="Saving createDriverTravelInfo Info..." />
+		<executeQuery>
+			<QueryString>
+				<Query>
+
+					<DeleteAll>
+						<DriverTravelInfo>
+							<OperatorAppID eq="[:$Macro.Argument.OperatorAppID:]"/>
+							<DriverID eq="[:$Macro.Argument.DriverID:]"/>
+						</DriverTravelInfo>
+					</DeleteAll>
+					
+					<Save>
+						<DriverTravelInfo>
+							<OperatorAppID>[:$Macro.Argument.OperatorAppID:]</OperatorAppID>
+							<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+							<DestinationLocation>
+								<Latitude>[:$Macro.Argument.DestLatitude:]</Latitude>
+								<Longitude>[:$Macro.Argument.DestLongitude:]</Longitude>
+							</DestinationLocation>
+							<CurrentLocation>
+								<Latitude>[:$Macro.Argument.CurrLatitude:]</Latitude>
+								<Longitude>[:$Macro.Argument.CurrLongitude:]</Longitude>
+							</CurrentLocation>
+							<TimeParked>[:$Macro.Argument.TimeParked:]</TimeParked>
+							<StartTime>[:$Macro.Argument.StartTime:]</StartTime>
+						</DriverTravelInfo>
+					</Save>
+				</Query>
+			</QueryString>
+		</executeQuery>
+	</Result>
+</Macro>

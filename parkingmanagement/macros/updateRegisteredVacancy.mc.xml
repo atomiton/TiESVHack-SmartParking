@@ -1,0 +1,29 @@
+<Macro name="updateRegisteredVacancy">
+	<Argument>
+		<String name="LotID"/>
+		<Integer name="RegisteredVacancy"/>
+	</Argument>
+	<Result>
+		<SetProcessData>
+			<Key>RegisteredVacancy</Key>
+			<Value>[:$Macro.Argument.RegisteredVacancy:]</Value>
+		</SetProcessData>
+		<executeQuery>
+			<QueryString>
+				<Find format="version">
+					<ParkingLot>
+						<LotID eq="[:$Macro.Argument.LotID:]" />
+					</ParkingLot>
+				</Find>
+				<SetResponseData>
+					<Key>Message.Value.Find.Result.ParkingLot.RegisteredVacancy.Value</Key>
+					<Value>[:$ProcessData.RegisteredVacancy:]</Value>
+				</SetResponseData>
+				<Update>
+					<from>Result</from>
+					<Include>$Response.Message.Value.Find</Include>
+				</Update>
+			</QueryString>
+		</executeQuery>
+	</Result>
+</Macro>

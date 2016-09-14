@@ -1,0 +1,67 @@
+<Macro name="selectRandomDestination">
+	<Argument/>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find>
+						<DriverDestination>
+							<ID ne="" />
+						</DriverDestination>
+					</Find>
+				</Query>
+					
+				<generateRandomInt>
+					<min>0</min>
+					<max>[:#d#$Response.Message.Value.Find/count(Result)-1:]</max>
+				</generateRandomInt>
+				<SetLocalData>
+					<key>randomNum</key>
+					<value>[:$Response.Message.Value.Rand.Num:]</value>
+				</SetLocalData>
+				
+				<Javascript>
+					var ResultSet = sffContext.getResponse().Message.Value;
+					var count = 0;
+					
+					for each( var destination in ResultSet.Find) 
+					{
+						if(destination != null &amp;&amp; destination !='undefined' &amp;&amp; destination != 'Success') {
+							if([:#d#$LocalData.randomNum:] == count) {
+								var selectedId = destination.DriverDestination.ID;
+								sffContext.setProcessData("selectedId", selectedId);
+								sffLog.info("selectRandomDestinationID::::::"+ selectedId);
+							}
+							count++;
+						}
+					}
+				</Javascript>
+			</QueryString>
+		</executeQuery>
+		<DelResponseData key="Message.Value.Find" />
+		<DelResponseData key="Message.Value.Rand" />
+		<SetResponseData>
+			<key>Message.Value.Sel.Id</key>
+			<value>[:$ProcessData.selectedId:]</value>
+		</SetResponseData>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="version">
+						<DriverDestination>
+							<ID eq="[:$ProcessData.selectedId:]" />
+						</DriverDestination>
+					</Find>
+				</Query>
+				<SetResponseData>
+					<key>Message.Value.Lat</key>
+					<value>[:$Response.Message.Value.Find.Result.DriverDestination.Destination.Latitude.Value:]</value>
+				</SetResponseData>
+				<SetResponseData>
+					<key>Message.Value.Lon</key>
+					<value>[:$Response.Message.Value.Find.Result.DriverDestination.Destination.Longitude.Value:]</value>
+				</SetResponseData>
+			</QueryString>
+		</executeQuery>
+	</Result>
+</Macro>

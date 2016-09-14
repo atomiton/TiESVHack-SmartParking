@@ -1,0 +1,98 @@
+<Macro Name="decideOperatorApp">
+	<Argument>
+		<String name="DriverID"/>
+	</Argument>
+	<Result>
+		<Log Message="Saving Driver Info..." />
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find>
+						<DriverOperator>
+							<DriverID eq="[:$Macro.Argument.DriverID:]" />
+						</DriverOperator>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<JavaScript>
+			function OperatorClass(operatorID, loyaltyCred) {
+				this.operatorID = operatorID;
+				this.loyaltyCred = parseFloat(loyaltyCred);
+			}
+			
+			var ResultSet = sffContext.getResponse().Message.Value;
+			var creds = [];
+			
+			for each(var result in ResultSet.Find) {
+				if(typeof(result) == 'object') {
+					sffLog.info("ID: " + result.DriverOperator.OperatorID);
+					sffLog.info("LoyaltyCred: " + result.DriverOperator.LoyaltyCredit);
+					creds.push(new OperatorClass(result.DriverOperator.OperatorID, result.DriverOperator.LoyaltyCredit));
+				}
+			}
+			
+			creds.sort(function (a,b){
+				return b.loyaltyCred - a.loyaltyCred;
+			});
+			
+			if(creds.length &gt; 5) {
+				sffLog.info("creds.length: " + creds.length);
+				creds.slice(5);
+				sffLog.info("creds.length: " + creds.length);
+				var nums = [0,1,2,3,4],
+				ranNums = [],
+				i = nums.length,
+				j = 0;
+				
+				while (i-- &amp;&amp; i &gt; 1) {
+					j = Math.floor(Math.random() * (i+1));
+					ranNums.push(nums[j]);
+					nums.splice(j,1);
+				} 
+				
+				sffLog.info(ranNums);
+				
+				sffContext.setLocalData("App1", creds[ranNums[0]].operatorID);
+				sffContext.setLocalData("App2", creds[ranNums[1]].operatorID);
+				sffContext.setLocalData("App3", creds[ranNums[2]].operatorID);
+			} else {
+				sffLog.info("Inside Else");
+				var x = 0; 
+				for(; x &lt; creds.length; x++){
+					sffLog.info("App"+(x+1));
+					sffContext.setLocalData("App"+(x+1), creds[x].operatorID);
+				}
+				
+				for(; x &lt;= 3; x++) {
+					sffLog.info("App"+(x+1));
+					sffContext.setLocalData("App"+(x+1), "");
+				}
+			}
+			
+		</JavaScript>
+		
+		<Log message="App1: [:$LocalData.App1:]" />
+		<Log message="App2: [:$LocalData.App2:]" />
+		<Log message="App3: [:$LocalData.App3:]" />
+		<Log message="App3: [:$LocalData:]" />
+		
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.OperatorAppID1" value="[:$LocalData.App1:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.OperatorAppID1" value="[:$LocalData.App1:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.OperatorAppID1" value="[:$LocalData.App1:]"/>
+			</BTCode>
+		</reverseBridge>
+	</Result>
+	
+	
+</Macro>

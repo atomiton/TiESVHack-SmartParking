@@ -1,0 +1,42 @@
+<Macro name="updateOperatorAppVacancies">
+	<Argument>
+		<String name="OperatorID" />
+		<String name="LotID" />
+        <Integer name="CurrentVacancies" />
+	</Argument>
+	<Result>
+		<SetProcessData>
+			<Key>CurrentVacancies</Key>
+			<Value>[:$Macro.Argument.CurrentVacancies:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>LotID</Key>
+			<Value>[:$Macro.Argument.LotID:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>OperatorID</Key>
+			<Value>[:$Macro.Argument.OperatorID:]</Value>
+		</SetProcessData>
+		<executeQuery>
+			<QueryString>
+				<Query>	
+					<Find format="current,version">
+						<OperatorApp>
+							<OperatorID eq="[:$ProcessData.OperatorID:]" />
+							<LotID eq="[:$ProcessData.LotID:]" />
+						</OperatorApp>
+					</Find>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.OperatorApp.CurrentVacancies.Value</Key>
+						<Value>[:$ProcessData.CurrentVacancies:]</Value>
+					</SetResponseData>
+					<Update>
+						<from>Result</from>
+						<Include>$Response.Message.Value.Find</Include>
+					</Update>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<DelResponseData key="Message.Value.Find" />
+	</Result>
+</Macro>

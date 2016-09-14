@@ -1,0 +1,22 @@
+<Macro name="searchForParkingInDecisionRangeAll">
+	<Argument>
+		<String name="DriverID"/>
+	</Argument>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Find format="version">
+					<CityParkingApp>
+						<ID ne="" />
+					</CityParkingApp>
+				</Find>
+			</QueryString>
+		</executeQuery>
+		<For each="appInfo" in="Find.Result.CityParkingApp" using="$ProcessData" >
+			<searchForParkingInDecisionRange>
+				<OperatorID>[:$ProcessData.appInfo.OperatorID.Value:]</OperatorID>	
+				<DriverID>[:$Macro.Argument.DriverID:]</DriverID>	
+			</searchForParkingInDecisionRange>
+		</For>
+	</Result>
+</Macro>

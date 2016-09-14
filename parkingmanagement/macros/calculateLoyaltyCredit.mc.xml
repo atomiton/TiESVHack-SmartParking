@@ -1,0 +1,43 @@
+<Macro name="calculateLoyaltyCredit">
+	<Argument>
+		<Number name="Satisfaction"/>
+		<String name="OperatorID"/>
+	</Argument>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<find format="current,version">
+   						<ParkingLotOperator>
+     						<OperatorID eq="[:$Macro.Argument.OperatorID:]"/>
+						</ParkingLotOperator>
+					</find>
+					<SetProcessData>
+						<Key>LoyaltyCredits</Key>
+						<Value>[:$Response.Message.Value.Find.Result.ParkingLotOperator.LoyaltyCredit.Value:]</Value>
+					</SetProcessData>
+					<JavaScript>
+							var loyaltycredit = 0;
+							if("[:$ProcessData.LoyaltyCredits:]" != '0E-10') {
+								loyaltycredit = parseFloat("[:$ProcessData.LoyaltyCredits:]");
+							}
+							
+							var satisfaction = parseFloat("[:$Macro.Argument.Satisfaction:]");
+							var loyaltycredit = loyaltycredit + satisfaction ;
+							sffLog.info("loyaltycredit  ======" + loyaltycredit );
+							sffContext.setLocalData("Loyaltycredit",loyaltycredit);
+					</JavaScript>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.ParkingLotOperator.LoyaltyCredit.Value</Key>
+						<Value>[:$LocalData.Loyaltycredit:]</Value>
+					</SetResponseData>
+					<Update>
+						<from>Result</from>
+						<Include>$Response.Message.Value.Find</Include>
+					</Update>	
+				</Query>
+			</QueryString>
+	   </executeQuery>
+		
+	</Result>
+</Macro>

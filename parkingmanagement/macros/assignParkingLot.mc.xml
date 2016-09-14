@@ -1,0 +1,160 @@
+<Macro Name="assignParkingLot">
+  <Argument>
+    <String name="UserName"/>
+  </Argument>
+  <Result>
+    <executeQuery>
+      <QueryString>
+        <Find>
+          <DeveloperDetails>
+            <ID ne=''/>
+          </DeveloperDetails>
+        </Find>
+      </QueryString>
+    </executeQuery>
+    <if condition="$Response.Message.Value/Find/count(Result/DeveloperDetails) lt 10">
+      <then>
+        <DelResponseData Key="Message.Value.Find"/>
+        <executeQuery>
+          <QueryString>
+            <Find>
+              <ParkingLot>
+                <OperatorID eq='NA'/>
+              </ParkingLot>
+            </Find>
+          </QueryString>
+        </executeQuery>
+        <JavaScript>
+          <Resp>
+            <Include>$Response.Message.Value</Include>
+          </Resp>
+          var resultData = Resp.Find;
+          var ctr = 0;
+          var lotIds = new Array(2);
+		  var lotIdVal = new Array(2);
+          for each(var parkingLotData
+          in resultData.iterValues("Result")) {
+          if(ctr &lt; 2){
+          lotIds[ctr] =
+          parkingLotData.ParkingLot.ID;
+          lotIdVal[ctr] =
+          parkingLotData.ParkingLot.LotID;
+          ctr ++;
+          }else{
+          break;
+          }
+          }
+          sffContext.execute("SetContextData","key","Lot1Id","value",lotIds[0]);
+          sffContext.execute("SetContextData","key","Lot2Id","value",lotIds[1]);
+          sffContext.execute("SetProcessData","key","lotIdVal1","value",lotIdVal[0]);
+          sffContext.execute("SetProcessData","key","lotIdVal2","value",lotIdVal[1]);
+        </JavaScript>
+        <executeQuery>
+          <QueryString>
+            <create>
+              <ParkingLotIDs>
+                <LotID>[:$ContextData.Lot1Id:]</LotID>
+              </ParkingLotIDs>
+            </create>
+          </QueryString>
+        </executeQuery>
+        <if condition="$Response.Message.Value.Create/Status eq 'Success'">
+          <then>
+            <SetContextData key="Lot1MappingId" value="[:$Response.Message.Value.Create.ParkingLotIDs.ID:]"/>
+          </then>
+        </if>
+        <executeQuery>
+          <QueryString>
+            <create>
+              <ParkingLotIDs>
+                <LotID>[:$ContextData.Lot2Id:]</LotID>
+              </ParkingLotIDs>
+            </create>
+          </QueryString>
+        </executeQuery>
+        <if condition="$Response.Message.Value.Create/Status eq 'Success'">
+          <then>
+            <SetContextData key="Lot2MappingId" value="[:$Response.Message.Value.Create.ParkingLotIDs.ID:]"/>
+          </then>
+        </if>
+        <executeQuery>
+          <QueryString>
+            <create>
+              <DeveloperDetails>
+                <UserName>[:$Macro.Argument.UserName:]</UserName>
+              </DeveloperDetails>
+            </create>
+          </QueryString>
+        </executeQuery>
+        <SetContextData key="DeveloperDetailsSysId" value="[:$Response.Message.Value.Create.DeveloperDetails.ID:]"/>
+		<createOperator>
+			<LotID1>[:$ProcessData.lotIdVal1:]</LotID1>
+			<LotID2>[:$ProcessData.lotIdVal2:]</LotID2>
+			<OperatorID>[:$ContextData.DeveloperDetailsSysId:]</OperatorID>
+		</createOperator>
+        <executeQuery>
+          <QueryString>
+            <create>
+              <ParkingLotMappings>
+                <DeveloperID>[:$ContextData.DeveloperDetailsSysId:]</DeveloperID>
+                <ParkingLotId>[:$ContextData.Lot1MappingId:]</ParkingLotId>
+                <AccessType>ReadWrite</AccessType>
+              </ParkingLotMappings>
+            </create>
+            <create>
+              <ParkingLotMappings>
+                <DeveloperID>[:$ContextData.DeveloperDetailsSysId:]</DeveloperID>
+                <ParkingLotId>[:$ContextData.Lot2MappingId:]</ParkingLotId>
+                <AccessType>ReadWrite</AccessType>
+              </ParkingLotMappings>
+            </create>
+          </QueryString>
+        </executeQuery>
+        <executeQuery>
+          <QueryString>
+            <find format="Version">
+              <ParkingLot>
+                <ID>[:$ContextData.Lot1Id:]</ID>
+              </ParkingLot>
+            </find>
+            <SetResponseData>
+              <key>Message.Value.Find.Result.ParkingLot.OperatorID.Value</key>
+              <value>[:$ContextData.DeveloperDetailsSysId:]</value>
+            </SetResponseData>
+            <Update>
+              <from>Result</from>
+              <Include>$Response.Message.Value.Find</Include>
+            </Update>
+          </QueryString>
+        </executeQuery>
+        <executeQuery>
+          <QueryString>
+            <find format="Version">
+              <ParkingLot>
+                <ID>[:$ContextData.Lot2Id:]</ID>
+              </ParkingLot>
+            </find>
+            <SetResponseData>
+              <key>Message.Value.Find.Result.ParkingLot.OperatorID.Value</key>
+              <value>[:$ContextData.DeveloperDetailsSysId:]</value>
+            </SetResponseData>
+            <Update>
+              <from>Result</from>
+              <Include>$Response.Message.Value.Find</Include>
+            </Update>
+          </QueryString>
+        </executeQuery>
+        <SetResponseData Key="Message.Value.Status" Value="Success"/>
+        <DelResponseData Key="Message.Value.Create"/>
+        <DelResponseData Key="Message.Value.Find"/>
+        <DelResponseData Key="Message.Value.Update"/>
+      </then>
+      <else>
+        <SetResponseData Key="Message.Value.Status" Value="Failed"/>
+        <SetResponseData Key="Message.Value.Message" Value="Developer limit exceeded."/>
+        <DelResponseData Key="Message.Value.Find"/>
+      </else>
+    </if>
+    <DelResponseData Key="Message.Value.Find"/>
+  </Result>
+</Macro>

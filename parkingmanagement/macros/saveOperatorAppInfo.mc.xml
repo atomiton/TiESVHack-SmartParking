@@ -1,0 +1,79 @@
+<Macro name="saveOperatorAppInfo">
+	<Argument>
+	  	<String name="OperatorID" />
+        <String name="LotNumber" />
+      	<DateTime name="ParkingDateAndTime" />
+        <Integer name="CurrentVacancies"/>
+        <Boolean name="ReservationOffered"/>
+        <Number name="ReservationPrice"/>
+	</Argument>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="current,version">
+						<ParkingLotOperator>
+							<OperatorID eq="[:$Macro.Argument.OperatorID:]" />
+						</ParkingLotOperator>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<if condition="/[:$Macro.Argument.LotNumber:] eq 1">
+			<then>
+				<SetProcessData key="LotID" value="[:$Response.Message.Value.Find.Result.ParkingLotOperator.LotID1.Value:]" />
+			</then>
+		</if>
+		<if condition="/[:$Macro.Argument.LotNumber:] eq 2">
+			<then>
+				<SetProcessData key="LotID" value="[:$Response.Message.Value.Find.Result.ParkingLotOperator.LotID2.Value:]" />
+			</then>
+			<else>
+				<SetResponseData Key="Message.Value.Status" Value="Failure"/>
+				<SetResponseData Key="Message.Value.Message" Value="Invalid Lot"/>
+			</else>
+		</if>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="current,version">
+						<OperatorApp>
+							<OperatorID eq="[:$Macro.Argument.OperatorID:]" />
+							<LotID eq="[:$ProcessData.LotID:]" />
+						</OperatorApp>
+					</Find>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.OperatorApp.OperatorID.Value</Key>
+						<Value>[:$Macro.Argument.OperatorID:]</Value>
+					</SetResponseData>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.OperatorApp.CurrentVacancies.Value</Key>
+						<Value>[:$Macro.Argument.CurrentVacancies:]</Value>
+					</SetResponseData>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.OperatorApp.ReservationOffered.Value</Key>
+						<Value>[:$Macro.Argument.ReservationOffered:]</Value>
+					</SetResponseData>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.OperatorApp.ReservationPrice.Value</Key>
+						<Value>[:$Macro.Argument.ReservationPrice:]</Value>
+					</SetResponseData>
+					<JavaScript>
+						sffContext.setProcessData("date", new Date());
+					</JavaScript>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.OperatorApp.LastInfoUpdate.Value</Key>
+						<Value>[:$ProcessData.date:]</Value>
+					</SetResponseData>
+					<Update>
+						<from>Result</from>
+						<Include>$Response.Message.Value.Find</Include>
+					</Update>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<DelResponseData Key="Message.Value.Find"/>
+        <DelResponseData Key="Message.Value.Update"/>
+		<SetResponseData Key="Message.Value.Status" Value="[:$Response.Message.Value.Update.Status:]"/>
+		</Result>
+</Macro>

@@ -1,0 +1,40 @@
+<Macro name="calculateUtilityValue">
+	<Argument>
+		<Number name="LCAVG" />
+		<Number name="AoA" />
+		<Number name="Trustworthiness" />
+		<Number name="Distance" />
+		<Number name="ParkTime" />
+		<Number name="Price" />
+	</Argument>
+	<Result>
+
+		<JavaScript>
+			var a = parseFloat("[:RuntimeParams.CONSTANT_A:]");
+			var b = parseFloat("[:RuntimeParams.CONSTANT_B:]");
+			var c = parseFloat("[:RuntimeParams.CONSTANT_C:]");
+			var d = parseFloat("[:RuntimeParams.CONSTANT_D:]");
+			var e = parseFloat("[:RuntimeParams.CONSTANT_E:]");
+			
+			var lcAvg = parseFloat("[:$Macro.Argument.LCAVG:]");
+			var A = parseFloat("[:$Macro.Argument.AoA:]");
+			var T = parseFloat("[:$Macro.Argument.Trustworthiness:]");
+			var D = parseFloat("[:$Macro.Argument.Distance:]");
+			var t = parseFloat("[:$Macro.Argument.ParkTime:]");
+			var P = parseFloat("[:$Macro.Argument.Price:]");
+			
+			var u = a*lcAvg+b*Math.log(A*100)+c*T-d*Math.sqrt(D)-e*(t*P);
+			sffLog.info(a*lcAvg);
+			sffLog.info(b*Math.log(A*100));
+			sffLog.info(c*T);
+			sffLog.info(d*Math.sqrt(D));
+			sffLog.info(e*(t*P));
+			sffContext.setProcessData("UtilityValue",u);
+		</JavaScript>
+		
+		<SetResponseData>
+			<Key>Message.Value.Result.UtilityValue</Key>
+			<Value>[:$ProcessData.UtilityValue:]</Value>
+		</SetResponseData>
+	</Result>
+</Macro>

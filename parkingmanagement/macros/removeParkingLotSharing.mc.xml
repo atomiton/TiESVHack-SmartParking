@@ -1,0 +1,44 @@
+<Macro Name="removeParkingLotSharing">
+  <Argument>
+    <String name="UserName"/>
+    <String name="LotId"/>
+  </Argument>
+  <Result>
+    <executeQuery>
+      <QueryString>
+        <Find>
+          <DeveloperDetails>
+            <UserName>[:$Macro.Argument.UserName:]</UserName>
+          </DeveloperDetails>
+        </Find>
+      </QueryString>
+    </executeQuery>
+    <if condition="$Response.Message.Value/Find/Status eq 'Success'">
+      <then>
+        <SetContextData key="DeveloperDetailsSysId" value="[:$Response.Message.Value.Find.Result.DeveloperDetails.ID:]"/>
+        <executeQuery>
+          <QueryString>
+            <DeleteAll>
+              <ParkingLotMappings>
+                <DeveloperID>[:$ContextData.DeveloperDetailsSysId:]</DeveloperID>
+                <ParkingLotId>[:$Macro.Argument.LotId:]</ParkingLotId>
+              </ParkingLotMappings>
+            </DeleteAll>
+          </QueryString>
+        </executeQuery>
+        <if condition="$Response.Message.Value/DeleteAll/Status eq 'Success'">
+          <then>
+            <SetResponseData Key="Message.Value.Status" Value="Success"/>
+            <DelResponseData Key="Message.Value.Create"/>
+            <DelResponseData Key="Message.Value.Find"/>
+          </then>
+          <else>
+            <SetResponseData Key="Message.Value.Status" Value="Failed"/>
+            <DelResponseData Key="Message.Value.Create"/>
+            <DelResponseData Key="Message.Value.Find"/>
+          </else>
+        </if>
+      </then>
+    </if>
+  </Result>
+</Macro>

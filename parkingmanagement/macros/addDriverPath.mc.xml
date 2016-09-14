@@ -1,0 +1,29 @@
+<Macro name="addDriverPath">
+	<Argument>
+		<DriverID></DriverID>
+		<Position></Position>
+		<Lat></Lat>
+		<Lon></Lon>
+		<DistanceFromDest></DistanceFromDest>
+	</Argument>
+	
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<create>
+						<TempDriverPath>
+							<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+							<Position>[:$Macro.Argument.Position:]</Position>
+							<Location>
+								<Latitude>[:$Macro.Argument.Lat:]</Latitude>
+								<Longitude>[:$Macro.Argument.Lon:]</Longitude>
+							</Location>
+							<DistanceFromDest>[:$Macro.Argument.DistanceFromDest:]</DistanceFromDest>
+						</TempDriverPath>
+					</create>
+				</Query>
+			</QueryString>
+		</executeQuery>	
+	</Result>
+</Macro>

@@ -1,0 +1,67 @@
+<Macro name="getDriversInRange">
+	<Argument>
+		<String name="DriverID"/>
+		<Number name="x2" />
+		<Number name="y2" />
+	</Argument>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="version,current">
+						<ParkingLot>
+							<ID ne="" />
+						</ParkingLot>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+
+					
+			<For each="pkLot" in="Find.Result.ParkingLot" using="$ProcessData" >
+					<JavaScript>
+						sffLog.info("***********************GetDriversInRange***********************");
+
+						var x1 = parseFloat("[:$ProcessData.pkLot.LotLocation.Latitude.Value:]");
+						var y1 = parseFloat("[:$ProcessData.pkLot.LotLocation.Longitude.Value:]");
+						var x2 = parseFloat("[:$Macro.Argument.x2:]");
+						var y2 = parseFloat("[:$Macro.Argument.y2:]");
+						var distance = Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+						sffLog.info(" latitude====================" + x1); 
+						sffLog.info(" longitude====================" + y1); 
+						sffLog.info(" distance====================" + distance); 
+
+						var responses = [];			
+						var loadDriversList = ListMap.static.newInstance();
+						var driMapList = loadDriversList.instanceAdd("AddResponseData");
+						driMapList.put("Key","Message.Value.OperatorList");
+						driMapList.put("Value", "");
+						responses.push(loadDriversList);
+
+						if(distance &lt;= [:RuntimeParams.Max_Range:])
+						{
+							var addDriverId = ListMap.static.newInstance();
+							var idMap = addDriverId.instanceAdd("AddResponseData");
+							idMap.put("Key","Message.Value.OperatorList.DriverId");
+							idMap.put("Value", "[:$Macro.Argument.DriverId:]");
+							responses.push(addDriverId);
+							sffLog.info(" Driver Added");
+						}
+						else
+						{
+							sffLog.info("Driver Out Of Range");
+						}
+							
+							sffLog.info("responses are:" + responses);
+							result = "";
+							for(k = 0; k &lt; responses.length; k++) {
+							result = result + responses[k];
+						}
+						result;
+
+					</JavaScript>
+			 </For>
+			<Log message="Removing Response!!!" />
+			<DelResponseData key="Message.Value.Find" />
+		</Result>
+</Macro>

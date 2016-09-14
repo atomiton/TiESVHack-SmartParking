@@ -1,0 +1,49 @@
+<Macro name="calculateDistance">
+	<Argument>
+		<String name="LotLatitude" />
+		<String name="LotLongitude" />
+		<String name="DestLatitude" />
+		<String name="DestLongitude" />
+		<String name="unit" default="miles" />
+	</Argument>
+	
+	<Result>
+		<Log message="calculateDistance: [:$Macro.Argument.LotLatitude:]" />
+		<Log message="calculateDistance: [:$Macro.Argument.LotLongitude:]" />
+		<Log message="calculateDistance: [:$Macro.Argument.DestLatitude:]" />
+		<Log message="calculateDistance: [:$Macro.Argument.DestLongitude:]" />
+		<Log message="calculateDistance: [:$Macro.Argument.unit:]" />
+		<JavaScript>
+			Number.prototype.toRad = function() {
+			   return this * Math.PI / 180;
+			};
+
+			var lat2 = parseFloat("[:$Macro.Argument.LotLatitude:]"); 
+			var lon2 = parseFloat("[:$Macro.Argument.LotLongitude:]"); 
+			var lat1 = parseFloat("[:$Macro.Argument.DestLatitude:]"); 
+			var lon1 = parseFloat("[:$Macro.Argument.DestLongitude:]");  
+
+			var R = 6371; // km 
+			//has a problem with the .toRad() method below.
+			var x1 = lat2-lat1;
+			var dLat = x1.toRad();  
+			var x2 = lon2-lon1;
+			var dLon = x2.toRad();  
+			var a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
+							Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * 
+							Math.sin(dLon/2) * Math.sin(dLon/2);  
+			var distInMiles = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+			var distInKms = R * distInMiles; 
+			sffLog.info("in kms: " + distInKms);
+			sffLog.info("in miles: " + distInKms*0.621371);
+			if("[:$Macro.Argument.unit:]" == 'miles') {
+				sffContext.setLocalData("distance", distInKms*0.621371);
+			} else {
+				sffContext.setLocalData("distance", distInKms);
+			}
+		</JavaScript>
+		<SetResponseData key="Message.Value.Result.Distance">
+			<Value>[:$LocalData.distance:]</Value>
+		</SetResponseData>
+	</Result>
+</Macro>

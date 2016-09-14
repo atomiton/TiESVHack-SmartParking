@@ -1,0 +1,109 @@
+<AppFacet name="DriverFacet">
+	<String name="Status" knownBy="GetReservations"/>
+	
+	<Action name="GetReservations" >
+		<Workflow Limit="1" Live="1" Timeout="-1">
+			<Task name="Main" while="true">
+				<Event name="Argument" as="ActionArgument" />
+				<Invoke name="GetClock" waitFor="Argument">
+					<FacetScript>
+						<SubscribeToTQL TopicName="TQL.Update.parkingmanagement.management.OperatorApp.ReservationPrice.*" TopicId="[:RuntimeParams.TQLStudio_TopicFacetIDName:]DriverController">
+							<ActionName>
+								<Log message="Known: [:$Request.Message.Value.Publish.Value:]" />
+								<executeQuery>
+									<QueryString>
+										<Query>
+											<Find>
+												<OperatorApp>
+													<AppID eq="[:$Request.Message.Value.Publish.$sid:]" />
+												</OperatorApp>
+											</Find>
+											<Log Message="[:$Response.Message.Value:]" />
+											<SetProcessData>
+												<Key>LotID</Key>
+												<Value>[:$Response.Message.Value.Find.Result.OperatorApp.LotID:]</Value>
+											</SetProcessData>
+											<SetProcessData>
+												<Key>OperatorID</Key>
+												<Value>[:$Response.Message.Value.Find.Result.OperatorApp.OperatorID:]</Value>
+											</SetProcessData>
+											<SetProcessData>
+												<Key>TodaysPrice</Key>
+												<Value>[:$Response.Message.Value.Find.Result.OperatorApp.ReservationPrice:]</Value>
+											</SetProcessData>
+											<SetProcessData>
+												<Key>OperatorAppID</Key>
+												<Value>[:$Response.Message.Value.Find.Result.OperatorApp.OperatorAppID:]</Value>
+											</SetProcessData>
+											<SetProcessData>
+												<Key>CurrentVacancies</Key>
+												<Value>[:$Response.Message.Value.Find.Result.OperatorApp.CurrentVacancies:]</Value>
+											</SetProcessData>
+											<SetProcessData>
+												<Key>CurrentVacancies</Key>
+												<Value>[:$Response.Message.Value.Find.Result.OperatorApp.CurrentVacancies:]</Value>
+											</SetProcessData>
+											<SetProcessData>
+												<Key>OperatorAppValue</Key>
+												<Value>[:$Response.Message.Value.Find.Result.OperatorApp.OperatorAppValue:]</Value>
+											</SetProcessData>
+										</Query>
+									</QueryString>
+								</executeQuery>
+								<!-- <Log Message="[:$Response.Message.Value:]" /> -->
+								<executeQuery>
+									<QueryString>
+										<Query>
+											<Find format="version">
+												<Driver>
+													<ID ne="" />
+												</Driver>
+											</Find>
+										</Query>
+									</QueryString>
+								</executeQuery>
+								<For each="driver" in="Find.Result.Driver" using="$ProcessData" >
+									<reverseBridge>
+										<BTCode>
+											<Set wid="driver[:$ProcessData.driver.DriverID.Value:]" target="DriverBT.LotID" value="[:$ProcessData.LotID:]"/>
+										</BTCode>
+									</reverseBridge>
+									<reverseBridge>
+										<BTCode>
+											<Set wid="driver[:$ProcessData.driver.DriverID.Value:]" target="DriverBT.OperatorID" value="[:$ProcessData.OperatorID:]"/>
+										</BTCode>
+									</reverseBridge>
+									<reverseBridge>
+										<BTCode>
+											<Set wid="driver[:$ProcessData.driver.DriverID.Value:]" target="DriverBT.TodaysPrice" value="[:$ProcessData.TodaysPrice:]"/>
+										</BTCode>
+									</reverseBridge>
+									<reverseBridge>
+										<BTCode>
+											<Set wid="driver[:$ProcessData.driver.DriverID.Value:]" target="DriverBT.OperatorAppID" value="[:$ProcessData.OperatorAppID:]"/>
+										</BTCode>
+									</reverseBridge>
+									<reverseBridge>
+										<BTCode>
+											<Set wid="driver[:$ProcessData.driver.DriverID.Value:]" target="DriverBT.CurrentVacancies" value="[:$ProcessData.CurrentVacancies:]"/>
+										</BTCode>
+									</reverseBridge>
+									<reverseBridge>
+										<BTCode>
+											<Set wid="driver[:$ProcessData.driver.DriverID.Value:]" target="DriverBT.OperatorAppValue" value="[:$ProcessData.OperatorAppValue:]"/>
+										</BTCode>
+									</reverseBridge>
+									<reverseBridge>
+										<BTCode>
+											<Set wid="driver[:$ProcessData.driver.DriverID.Value:]" target="DriverBT.CalculateFeasibility" value="1"/>
+										</BTCode>
+									</reverseBridge>
+								</For>
+							</ActionName>
+						</SubscribeToTQL>
+					</FacetScript>
+				</Invoke>
+			</Task>
+		</Workflow>
+	</Action>
+</AppFacet>	

@@ -1,0 +1,45 @@
+<Macro name="updatePriceByParkingLotOperator">
+	<Argument>
+		<String name="OperatorID" />
+		<Number name="LotOnePrice" />
+		<Number name="LotTwoPrice" />
+	</Argument>
+	<Result>
+		<SetProcessData>
+			<Key>LotOnePrice</Key>
+			<Value>[:$Macro.Argument.LotOnePrice:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>LotTwoPrice</Key>
+			<Value>[:$Macro.Argument.LotTwoPrice:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>OperatorID</Key>
+			<Value>[:$Macro.Argument.OperatorID:]</Value>
+		</SetProcessData>
+		<executeQuery>
+			<QueryString>
+				<Query>	
+					<Find format="current,version">
+						<ParkingLotOperator>
+							<OperatorID eq="[:$ProcessData.OperatorID:]" />
+						</ParkingLotOperator>
+					</Find>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.ParkingLotOperator.LotOnePrice.Value</Key>
+						<Value>[:$ProcessData.LotOnePrice:]</Value>
+					</SetResponseData>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.ParkingLotOperator.LotTwoPrice.Value</Key>
+						<Value>[:$ProcessData.LotTwoPrice:]</Value>
+					</SetResponseData>
+					<Update>
+						<from>Result</from>
+						<Include>$Response.Message.Value.Find</Include>
+					</Update>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<DelResponseData key="Message.Value.Find" />
+	</Result>
+</Macro>

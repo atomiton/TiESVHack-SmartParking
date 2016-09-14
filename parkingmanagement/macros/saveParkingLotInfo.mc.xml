@@ -1,0 +1,38 @@
+<Macro name="saveParkingLotInfo">
+	<Argument>
+		<String name="LotID"/>
+		<String name="OperatorID"/>
+		<Number name="Latitude" />
+		<Number name="Longitude" />
+		<Number name="TodaysPrice" />
+		<Number name="CurrentVacancies" />
+	</Argument>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Log Message="********Deleting CityParkingAppUpdates Data**********"/>
+					<DeleteAll>
+						<CityParkingAppUpdates>
+							  <LotID eq="[:$Macro.Argument.LotID:]" />
+						</CityParkingAppUpdates>
+					</DeleteAll>
+					<Log Message="********creating CityParkingAppUpdates Data**********"/>
+					<Create>
+						<CityParkingAppUpdates>
+							  <OperatorID>[:$Macro.Argument.OperatorID:]</OperatorID>  
+	     					  <LotID>[:$Macro.Argument.LotID:]</LotID>
+	      					  <LotLocation>
+	      					  		<Latitude>[:$Macro.Argument.Latitude:]</Latitude>
+									<Longitude>[:$Macro.Argument.Longitude:]</Longitude>
+	      					  </LotLocation>
+	 						  <LastInfoUpdate></LastInfoUpdate> 
+	        				  <TodaysPrice>[:$Macro.Argument.TodaysPrice:]</TodaysPrice>
+	        				  <CurrentVacancies>[:$Macro.Argument.CurrentVacancies:]</CurrentVacancies>
+						</CityParkingAppUpdates>
+					</Create>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		</Result>
+</Macro>

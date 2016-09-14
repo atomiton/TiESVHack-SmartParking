@@ -1,0 +1,31 @@
+<Macro name="calculateCoordDistance">
+	<Argument>
+		<String name="x1" />
+		<String name="y1" />
+		<String name="x2" />
+		<String name="y2" />
+	</Argument>
+	
+	<Result>
+		<Log message="calculateCoordDistance: [:$Macro.Argument.x1:]" />
+		<Log message="calculateCoordDistance: [:$Macro.Argument.y1:]" />
+		<Log message="calculateCoordDistance: [:$Macro.Argument.x2:]" />
+		<Log message="calculateCoordDistance: [:$Macro.Argument.y2:]" />
+		
+		<JavaScript>
+			
+			var x1 = parseFloat("[:$Macro.Argument.x1:]"); 
+			var y1 = parseFloat("[:$Macro.Argument.y1:]"); 
+			var x2 = parseFloat("[:$Macro.Argument.x2:]"); 
+			var y2 = parseFloat("[:$Macro.Argument.y2:]");  
+
+			var distance = Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
+			sffContext.setLocalData("distance", distance);
+		</JavaScript>
+		
+		
+		<SetResponseData key="Message.Value.Result.Distance">
+			<Value>[:$LocalData.distance:]</Value>
+		</SetResponseData>
+	</Result>
+</Macro>

@@ -1,0 +1,36 @@
+<Macro name="calculateSatisfaction">
+	<Argument>
+		<Number name="HourlyPrice"/>
+		<Number name="PriceCeiling"/>
+		<Number name="ActualDistance"/>
+		<Number name="DistanceCeiling"/>
+	</Argument>
+	<Result>
+
+		<Log message="HourlyPrice: [:$Macro.Argument.HourlyPrice:]" />
+		<Log message="PriceCeiling: [:$Macro.Argument.PriceCeiling:]" />
+		<Log message="ActualDistance: [:$Macro.Argument.ActualDistance:]" />
+		<Log message="DistanceCeiling [:$Macro.Argument.DistanceCeiling:]" />
+		<JavaScript>
+	
+			var hourlyPrice = parseFloat("[:$Macro.Argument.HourlyPrice:]");
+			var priceCeiling = parseFloat("[:$Macro.Argument.PriceCeiling:]");
+			var actualDistance = parseFloat("[:$Macro.Argument.ActualDistance:]");
+			var distanceCeiling = parseFloat("[:$Macro.Argument.DistanceCeiling:]");
+			
+			var interimVal = (1-hourlyPrice/priceCeiling)*(1-actualDistance/distanceCeiling);
+			if(interimVal &lt; 0) {
+				interimVal = 0;
+			}
+			
+			var satisfaction = 100*Math.sqrt(interimVal);
+			sffLog.info("** Calculates Satisfaction: " + satisfaction);
+			sffContext.setProcessData("satisfaction",satisfaction);
+		</JavaScript>
+		
+		<SetResponseData>
+			<Key>Message.Value.Result.Satisfaction</Key>
+			<Value>[:$ProcessData.satisfaction:]</Value>
+		</SetResponseData>
+	</Result>
+</Macro>

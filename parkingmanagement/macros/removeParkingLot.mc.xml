@@ -1,0 +1,63 @@
+<Macro Name="removeParkingLot">
+  <Argument>
+    <String name="UserName"/>
+  </Argument>
+  <Result>
+    <executeQuery>
+      <QueryString>
+        <Find>
+          <DeveloperDetails>
+            <UserName>[:$Macro.Argument.UserName:]</UserName>
+          </DeveloperDetails>
+        </Find>
+      </QueryString>
+    </executeQuery>
+    <if condition="$Response.Message.Value/Find/Status eq 'Success'">
+      <then>
+        <SetContextData key="DeveloperDetailsSysId" value="[:$Response.Message.Value.Find.Result.DeveloperDetails.ID:]"/>
+        <executeQuery>
+          <QueryString>
+            <Find>
+              <ParkingLot>
+                <OperatorID>[:$ContextData.DeveloperDetailsSysId:]</OperatorID>
+              </ParkingLot>
+            </Find>
+          </QueryString>
+        </executeQuery>
+        <for each="findRes" in="Find.Result" using="$ProcessData">
+          <executeQuery>
+            <QueryString>
+              <find format="Version">
+                <ParkingLot>
+                  <ID>[:$ProcessData.findRes.ParkingLot.ID:]</ID>
+                </ParkingLot>
+              </find>
+              <SetResponseData>
+                <key>Message.Value.Find.Result.ParkingLot.OperatorID.Value</key>
+                <value>NA</value>
+              </SetResponseData>
+              <Update>
+                <from>Result</from>
+                <Include>$Response.Message.Value.Find</Include>
+              </Update>
+            </QueryString>
+          </executeQuery>
+          <executeQuery>
+            <QueryString>
+              <DeleteAll>
+                <ParkingLotMappings>
+                  <DeveloperID>[:$ContextData.DeveloperDetailsSysId:]</DeveloperID>
+                </ParkingLotMappings>
+              </DeleteAll>
+              <DeleteAll>
+                <DeveloperDetails>
+                  <UserName>[:$Macro.Argument.UserName:]</UserName>
+                </DeveloperDetails>
+              </DeleteAll>
+            </QueryString>
+          </executeQuery>
+        </for>
+      </then>
+    </if>
+  </Result>
+</Macro>

@@ -1,0 +1,18 @@
+<Macro Name="executeQuery">
+	<Argument>
+		<QueryString>
+			<Query />
+		</QueryString>
+	</Argument>
+	<Result>
+		<DoRequest target="[:RuntimeParams.TQLStudio_FacetIDName:]">
+			<Process>
+				<Message>
+					<Value>
+						[:$Macro.Argument.QueryString:]
+					</Value>
+				</Message>
+			</Process>
+		</DoRequest>
+	</Result>
+</Macro>

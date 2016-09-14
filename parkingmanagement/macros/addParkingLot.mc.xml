@@ -1,0 +1,34 @@
+<Macro Name="addParkingLot">
+	<Argument>
+		<String name="ParkingLotId" />
+		<String name="LotID" />
+		<Number name="Latitude" />
+		<Number name="Longitude" />
+		<String name="OperatorID" />
+	</Argument>
+	<Result>
+		<Log Message="Saving ParkingLot Info..." />
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Save>
+						<ParkingLot>
+							<ParkingLotId>[:$Macro.Argument.ParkingLotId:]</ParkingLotId>
+							<LotID>[:$Macro.Argument.LotID:]</LotID>
+							<LotLocation>
+							   	<Latitude>[:$Macro.Argument.Latitude:]</Latitude>
+								<Longitude>[:$Macro.Argument.Longitude:]</Longitude>
+							</LotLocation>
+							<OperatorID>NA</OperatorID>
+							<DigitalDisplay></DigitalDisplay>
+							<ReservationOffer></ReservationOffer>
+							<ReservationPrice>201</ReservationPrice>
+							<RegisteredVacancy>0</RegisteredVacancy>
+							<AuthorizedOperator></AuthorizedOperator>
+						</ParkingLot>
+					</Save>
+				</Query>
+			</QueryString>
+		</executeQuery>
+	</Result>
+</Macro>

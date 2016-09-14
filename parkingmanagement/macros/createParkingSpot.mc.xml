@@ -1,0 +1,24 @@
+<Macro Name="createParkingSpot">
+	<Argument>
+		<String name="LotID"/>
+		<String name="SpotID"/>
+	</Argument>
+	<Result>
+		<Log Message="Saving createParkingSpot Info..." />
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Save>
+						<ParkingSpot>
+							<LotID>[:$Macro.Argument.LotID:]</LotID>
+							<SpotID>[:$Macro.Argument.SpotID:]</SpotID>
+							<SpotStatus>Available</SpotStatus>
+							<SpotOccupiedSince></SpotOccupiedSince>
+							<HourToEmpty>0</HourToEmpty>
+						</ParkingSpot>
+					</Save>
+				</Query>
+			</QueryString>
+		</executeQuery>
+	</Result>
+</Macro>

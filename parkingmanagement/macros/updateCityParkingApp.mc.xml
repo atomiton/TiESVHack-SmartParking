@@ -1,0 +1,61 @@
+<Macro name="updateCityParkingApp">
+	<Argument/>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+						
+					<Find>
+						<CityParkingAppUpdates>
+							<LotID ne="" />
+						</CityParkingAppUpdates>
+					</Find>
+				
+					<For each="parkinglot" in="Find.Result.CityParkingAppUpdates" using="$ProcessData" >
+					<Log Message="********Deleting all Existing CityParkingApp Data**********"/>
+						<DeleteAll>
+							<CityParkingApp>
+								  <LotID eq="[:$ProcessData.parkinglot.LotID:]" />
+							</CityParkingApp>
+						</DeleteAll>
+						
+						<Find format="current,version">
+							<OperatorApp>
+								<OperatorID eq="[:$ProcessData.parkinglot.OperatorID:]" />
+								<LotID eq="[:$ProcessData.parkinglot.LotID:]" />
+							</OperatorApp>
+						</Find>
+						
+						<SetProcessData>
+							<Key>OpAppValue</Key>
+							<Value>[:$Response.Message.Value.Find.Result.OperatorApp.OperatorAppValue.Value:]</Value>
+						</SetProcessData>
+
+						<Log Message="********Creating CityParkingApp Data**********"/>
+						<Create>
+							<CityParkingApp>
+								  	<OperatorID>[:$ProcessData.parkinglot.OperatorID:]</OperatorID>  
+		     					  	<LotID>[:$ProcessData.parkinglot.LotID:]</LotID>
+		      					  	<LotLocation>
+			      					  	<Latitude>[:$ProcessData.parkinglot.LotLocation.Latitude:]</Latitude>
+									  	<Longitude>[:$ProcessData.parkinglot.LotLocation.Longitude:]</Longitude>
+		      					  	</LotLocation>
+		 						  	<LastInfoUpdate></LastInfoUpdate> 
+		        				  	<TodaysPrice>[:$ProcessData.parkinglot.TodaysPrice:]</TodaysPrice>	 
+		        				  	<CurrentVacancies>[:$ProcessData.parkinglot.CurrentVacancies:]</CurrentVacancies>	 
+									<OperatorReputation>[:$ProcessData.OpAppValue:]</OperatorReputation>
+							</CityParkingApp>
+						</Create>			
+				   </For>
+				   <Log Message="********Deleting CityParkingAppUpdates Data After copying**********"/>		
+					<DeleteAll>
+						<CityParkingAppUpdates>
+							  <LotID ne="" />
+						</CityParkingAppUpdates>
+					</DeleteAll>
+				</Query>
+			</QueryString>
+		</executeQuery>		
+		<DelResponseData key="Message.Value.Find" />
+	</Result>
+</Macro>

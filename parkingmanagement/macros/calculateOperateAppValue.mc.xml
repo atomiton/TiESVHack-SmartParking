@@ -1,0 +1,44 @@
+<Macro name="calculateOperateAppValue">
+	<Argument>
+		<Number name="Satisfaction"/>
+		<String name="LotID"/>
+	</Argument>
+	<Result>
+		<Log message="Lot ID in calculateOperateAppValue: [:$Macro.Argument.LotID:]" />
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<find format="current,version">
+   						<OperatorApp>
+     						<LotID eq="[:$Macro.Argument.LotID:]"/>
+						</OperatorApp>
+					</find>
+					<SetProcessData>
+						<Key>OperatorAppValue</Key>
+						<Value>[:$Response.Message.Value.Find.Result.OperatorApp.OperatorAppValue.Value:]</Value>
+					</SetProcessData>
+					<JavaScript>
+							sffLog.info("operatorAppValue  ====== [:$ProcessData.OperatorAppValue:]");
+							var operatorAppValue = 0;
+							if("[:$ProcessData.OperatorAppValue:]" != '0E-10') {
+								operatorAppValue = parseFloat("[:$ProcessData.OperatorAppValue:]");
+							} 
+							
+							var satisfaction = parseFloat("[:$Macro.Argument.Satisfaction:]");
+							var operatorAppValue = operatorAppValue + satisfaction ;
+							sffLog.info("operatorAppValue  ======" + operatorAppValue );
+							sffContext.setLocalData("OperatorAppValue",operatorAppValue);
+					</JavaScript>	
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.OperatorApp.OperatorAppValue.Value</Key>
+						<Value>[:$LocalData.OperatorAppValue:]</Value>
+					</SetResponseData>
+					<Update>
+						<from>Result</from>
+						<Include>$Response.Message.Value.Find</Include>
+					</Update>	
+				</Query>
+			</QueryString>
+		</executeQuery>
+	</Result>
+</Macro>

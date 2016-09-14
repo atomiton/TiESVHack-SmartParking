@@ -1,0 +1,24 @@
+<Macro name="generateRandomFloat">
+	<Argument>
+		<Number name="min" />
+		<Number name="max" />
+	</Argument>
+	
+	<Result>
+			<JavaScript>
+					function getRandomInt(min, max) {
+						return Math.random() * (max - min) + min;
+					}
+					var min = parseFloat("[:$Macro.Argument.min:]"); 
+					var max = parseFloat("[:$Macro.Argument.max:]"); 
+					var rNum = getRandomInt(min, max);
+					var setResponseData = ListMap.static.newInstance();   
+					var rc = setResponseData.instanceAdd("SetResponseData");
+					rc.put("key", "Message.Value.Rand.Num");
+					rc.put("value", rNum);
+					//sffLog.info("Response: " + setResponseData);
+					setResponseData;
+			</JavaScript>
+			
+	</Result>
+</Macro>

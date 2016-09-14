@@ -1,0 +1,64 @@
+<Macro name="searchForParkingInDecisionRange">
+	<Argument>
+		<String name="OperatorID"/>
+		<String name="DriverID"/>
+	</Argument>
+	<Result>
+		<SetProcessData>
+			<Key>DriverID</Key>
+			<Value>[:$Macro.Argument.DriverID:]</Value>
+		</SetProcessData>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="version">
+						<CityParkingApp>
+							<OperatorID eq="[:$Macro.Argument.OperatorID:]" />
+						</CityParkingApp>
+					</Find>
+					<SetProcessData>
+						<Key>OperatorID</Key>
+						<Value>[:$Response.Message.Value.Find.Result.CityParkingApp.OperatorID.Value:]</Value>
+					</SetProcessData>
+					<SetProcessData>
+						<Key>TodaysPrice</Key>
+						<Value>[:$Response.Message.Value.Find.Result.CityParkingApp.TodaysPrice.Value:]</Value>
+					</SetProcessData>
+					<SetProcessData>
+						<Key>LotID</Key>
+						<Value>[:$Response.Message.Value.Find.Result.CityParkingApp.LotID.Value:]</Value>
+					</SetProcessData>
+					<Log Message="CityParkingApp OperatorID:::::::: =====> [:$ProcessData.OperatorID:]"/>
+					<Log Message="CityParkingApp TodaysPrice:::::::: =====> [:$ProcessData.TodaysPrice:]"/>
+					<Log Message="CityParkingApp LotID:::::::: =====> [:$ProcessData.LotID:]"/>
+				</Query>
+			</QueryString>
+		</executeQuery>	
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverID:]" target="DriverBT.DriverID" value="[:$ProcessData.DriverID:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverID:]" target="DriverBT.LotID" value="[:$ProcessData.LotID:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverID:]" target="DriverBT.OperatorID" value="[:$ProcessData.OperatorID:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverID:]" target="DriverBT.TodaysPrice" value="[:$ProcessData.TodaysPrice:]"/>
+			</BTCode>
+		</reverseBridge>
+		<reverseBridge>
+			<BTCode>
+				<Set wid="driver[:$ProcessData.DriverID:]" target="DriverBT.SetValues2" value="1"/>
+			</BTCode>
+		</reverseBridge>	
+		<Log Message="CityParkingApp LotID 2:::::::: =====> [:$ProcessData.LotID:]"/>
+	</Result>
+</Macro>

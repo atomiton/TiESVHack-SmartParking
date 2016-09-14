@@ -1,0 +1,23 @@
+<Macro name="driverStreetUtilityFunctionPL">
+	<Argument>
+		<String name="driverId" />
+	</Argument>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find>
+						<ParkingLotOption>
+							<Id eq="" />
+						</ParkingLotOption>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<For each="pkLotOpt" in="Find.Result.ParkingLotOption" using="$ProcessData" >
+			<calculateUtilityValue>
+				<id>[:$ProcessData.pkLotOpt.ParkingLotOption.Id:]</id>	
+			</calculateUtilityValue>			
+		</For>
+	</Result>
+</Macro>

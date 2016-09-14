@@ -1,0 +1,27 @@
+<Macro name="updateParkingLotSpotStatus">
+	<Argument>
+		<String name="SpotStatus"/>
+		<String name="LotID"/>
+	</Argument>
+	<Result>
+	<Log Message="*****Executing updateParkingLotSpotStatus******" />
+	<SetLocalData>
+		<Key>spotStatus</Key>
+		<Value>[:$Macro.Argument.SpotStatus:]</Value>
+	</SetLocalData>	
+
+	<SetLocalData>
+		<Key>parkingLot</Key>
+		<Value>[:$Macro.Argument.LotID:]</Value>
+	</SetLocalData>
+		
+	<reverseBridge>
+		<BTCode>
+			<Set wid="parkingLot[:$LocalData.parkingLot:]" target="ParkingLotBT.SpotStatus" value="[:$LocalData.spotStatus:]"/>
+		</BTCode>
+	</reverseBridge>	
+	
+			
+			<DelResponseData key="Message.Value.Find" />
+		</Result>
+</Macro>

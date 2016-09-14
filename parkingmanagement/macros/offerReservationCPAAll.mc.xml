@@ -1,0 +1,127 @@
+<Macro name="offerReservationCPAAll">
+	<Argument>
+		<DriverID></DriverID>
+		<PriceCeiling></PriceCeiling>
+		<DistanceCeiling></DistanceCeiling>
+		<DestLat></DestLat>
+		<DestLon></DestLon>
+		<CurrLat></CurrLat>
+		<CurrLon></CurrLon>
+		<ParkTime></ParkTime>
+	</Argument>
+	<Result>
+	<Log Message="****************** START offerReservationCPAAll ***************************"/>
+		<Log message="***************** CHECKING AT LEVEL 2 *******************************" />
+		<executeQuery>
+			<QueryString>
+				<Find format="version">
+					<Driver>
+						<DriverID eq="[:$Macro.Argument.DriverID:]" />
+					</Driver>
+				</Find>
+			</QueryString>
+		</executeQuery>
+		<SetProcessData>
+			<Key>LastUtilityFunction</Key>
+			<Value>[:$Response.Message.Value.Find.Result.Driver.LastUtilityFunction.Value:]</Value>
+		</SetProcessData>
+		<executeQuery>
+			<QueryString>
+				<Find>
+					<CityParkingApp>
+						<ID ne="" />
+					</CityParkingApp>
+				</Find>
+			</QueryString>
+		</executeQuery>
+		
+		<Log message="IN OFFERRESERVATIONALL" />
+		<For each="cpa" in="Find.Result.CityParkingApp" using="$ProcessData" >
+			<JavaScript>
+				var rep = parseFloat("[:$ProcessData.cpa.OperatorReputation:]");
+				if(rep.isNaN()) {
+					rep = 0;
+				}
+				
+				var T = rep/2;
+				sffContext.setProcessData("T",T);
+			</JavaScript>
+			
+			<offerReservation>
+				<LotID>[:$ProcessData.cpa.LotID:]</LotID>
+				<SpotID></SpotID>
+				<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+				<DistanceCeiling>[:$Macro.Argument.DistanceCeiling:]</DistanceCeiling>
+				<PriceCeiling>[:$Macro.Argument.PriceCeiling:]</PriceCeiling>
+				<DestLat>[:$Macro.Argument.DestLat:]</DestLat>
+				<DestLon>[:$Macro.Argument.DestLon:]</DestLon>
+				<ParkTime>[:$Macro.Argument.ParkTime:]</ParkTime>
+				<TodaysPrice>[:$ProcessData.cpa.TodaysPrice:]</TodaysPrice>
+				<PriceSource>[:$Macro.Argument.PriceSource:]</PriceSource>
+				<OperatorID>[:$ProcessData.cpa.OperatorID:]</OperatorID>
+				<Level></Level>
+				<LastUtilityFunction>[:$ProcessData.LastUtilityFunction:]</LastUtilityFunction>
+				<CurrentVacancies>[:$ProcessData.cpa.CurrentVacancies:]</CurrentVacancies>
+				<OperatorAppValue>[:$ProcessData.cpa.T:]</OperatorAppValue>
+			</offerReservation>
+			<Log message="Utility Value: [:$Response.Message.Value.Result.LastUtilityValue:]" />
+			<SetLocalData>
+				<Key>LastUtilityFunction</Key>
+				<Value>[:$Response.Message.Value.Result.LastUtilityValue:]</Value>
+			</SetLocalData>
+		</For>
+		
+		<executeQuery>
+			<QueryString>
+				<Find>
+					<TempReservationRequest>
+						<DriverID eq="[:$Macro.Argument.DriverID:]" />
+					</TempReservationRequest>
+				</Find>
+			</QueryString>
+		</executeQuery>
+		
+		<If condition="/'[:$Response.Message.Value.Find/count(Result):]' eq 0">
+			<then>
+				<Log message="***************** HATT NOT AT LEVEL 2 *******************************" />
+				<checkInVisualRange>
+					<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+					<PriceCeiling>[:$Macro.Argument.PriceCeiling:]</PriceCeiling>
+					<DistanceCeiling>[:$Macro.Argument.DistanceCeiling:]</DistanceCeiling>
+					<DestLat>[:$Macro.Argument.DestLat:]</DestLat>
+					<DestLon>[:$Macro.Argument.DestLon:]</DestLon>
+					<CurrLat>[:$Macro.Argument.CurrLat:]</CurrLat>
+					<CurrLon>[:$Macro.Argument.CurrLon:]</CurrLon>
+					<ParkTime>[:$Macro.Argument.ParkTime:]</ParkTime>
+					<LastUtilityFunction>[:$LocalData.LastUtilityFunction:]</LastUtilityFunction>
+				</checkInVisualRange>
+			</then>
+			<else>
+				<Log message="**************** FOUND AT LEVEL 1 in offerReservationCPAAll****************" />
+				<SetProcessData>
+					<Key>LotID</Key>
+					<Value>[:$Response.Message.Value.Find.Result.TempReservationRequest.LotID:]</Value>
+				</SetProcessData>
+				<SetProcessData>
+					<Key>SpotID</Key>
+					<Value>[:$Response.Message.Value.Find.Result.TempReservationRequest.SpotID:]</Value>
+				</SetProcessData>
+				<setDecisionMade>
+     				<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+   					<LotID>[:$ProcessData.LotID:]</LotID>
+   					<SpotID>[:$ProcessData.SpotID:]</SpotID>
+   				</setDecisionMade>
+   				<executeQuery>
+					<QueryString>
+						<DeleteAll>
+							<TempReservationRequest>
+								<DriverID eq="[:$Macro.Argument.DriverID:]" />
+							</TempReservationRequest>
+						</DeleteAll>
+					</QueryString>
+				</executeQuery>
+			</else>
+		</If>
+		<Log Message="****************** END offerReservationCPAAll ***************************"/>
+	</Result>
+</Macro>

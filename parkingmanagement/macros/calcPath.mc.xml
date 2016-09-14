@@ -1,0 +1,203 @@
+ <Macro name="calcPath">
+    
+    <Argument>
+		<StartX>10</StartX>
+		<StartY>10</StartY>
+		<EndX>50</EndX>
+		<EndY>50</EndY>
+		<DriverID></DriverID>
+	</Argument>
+    
+    <Result>
+     
+      <JavaScript>
+			
+			var gridSize = {x:100, y:100};
+			var gridCount = {x:10, y:10};
+			var speed = 60; // m/min
+			var tick = 2; //min
+			var distPerTick = speed * tick;
+
+
+			function calcPath(beg, end)
+			{
+			  var points = [beg];
+			  var path = [beg];
+			  var addPaths = [];
+			  sffLog.info("Beg(" + beg.x +"," + beg.y + ")");
+				sffLog.info("End(" + end.x +"," + end.y + ")");
+			  snap(beg);
+			  snap(end);
+
+			  var displace;
+			  var step = distPerTick;
+			  var posCur = {x:beg.x, y:beg.y};
+			   sffLog.info("posCur(" + posCur.x +"," + posCur.y + ")");
+			  var dist = Math.abs(parseInt(posCur.x) - parseInt(end.x)) + Math.abs(parseInt(posCur.y) - parseInt(end.y));
+			  var itr = 0;
+			  while(dist != 0 &amp;&amp; ++itr &lt; 100)
+			  {
+				var delta = {x:parseInt(end.x) - parseInt(posCur.x), y:parseInt(end.y) - parseInt(posCur.y)};
+				 sffLog.info("posCur(" + posCur.x +"," + posCur.y + ")");
+				displace = {x:0, y:0};
+				var dir;
+				if(posCur.x % gridSize.x != 0) { //can't move in y direction
+					sffLog.info("can't move in y direction");
+				  dir = 'x';
+				}
+				else if(posCur.y % gridSize.y != 0) { //can't move in x direction
+					sffLog.info("can't move in x direction");
+				  dir = 'y';
+				}
+				else {//can move in both
+					sffLog.info("can move in both direction");
+				  dir = Math.abs(delta.x) > Math.abs(delta.y) ?  'x' : 'y';
+				}
+				
+				if(dist >= gridSize[dir])
+				{
+				  var grSize = gridSize[dir];
+				<!--   sffLog.info("grSize: " + grSize);
+				  sffLog.info("posCur[dir]: " + posCur[dir]); -->
+				  
+				  
+				 <!--  sffLog.info("(parseInt(posCur[dir]) + parseInt(grSize)): " + (Math.floor((parseInt(posCur[dir]) + parseInt(grSize)) / parseInt(grSize)) * parseInt(grSize) - parseInt(posCur[dir]))); -->
+				  
+				  if (delta[dir] &gt;= 0 ) {
+					displace[dir] = Math.floor((parseInt(posCur[dir]) + parseInt(grSize)) / parseInt(grSize)) * parseInt(grSize) - parseInt(posCur[dir]);
+				  } else {
+					displace[dir] = Math.ceil((parseInt(posCur[dir]) - parseInt(grSize)) / parseInt(grSize)) * parseInt(grSize) - parseInt(posCur[dir]);
+				  }
+				}
+				else
+				  displace[dir] = delta[dir];
+				while(Math.abs(displace[dir]) &gt;= step)
+				{
+				  var point = {x:posCur.x, y:posCur.y};
+				 <!--  sffLog.info("displace[" + dir + "]" + displace[dir]);
+				  sffLog.info("step: " + step); -->
+				  point[dir] = parseInt(point[dir]) + step * (displace[dir] &gt;= 0 ? 1 : -1);
+				  points.push(point);
+				  step = step + distPerTick;
+				}
+				step = step - Math.abs(displace[dir]);
+				if(step == 0)
+				  step = distPerTick;
+
+				posCur.x = parseInt(posCur.x) + parseInt(displace.x);
+				posCur.y = parseInt(posCur.y) + parseInt(displace.y);
+				path.push({x:posCur.x, y:posCur.y});
+				dist = Math.abs(posCur.x - end.x) + Math.abs(posCur.y - end.y);
+			  }
+			  if(itr &gt;= 100)
+			  {
+				sffLog.info("Beg(" + beg.x +"," + beg.y + ")");
+				sffLog.info("End(" + end.x +"," + end.y + ")");
+				
+				sffLog.info('Iteration limit exceeded');
+			  }
+			  
+			 var distToEnd = 0;
+			 
+			  
+			  <!-- for(s1 = 0; s1 &lt; path.length; s1++){ 
+				var b = path[s1];
+				sffLog.info("B(" + b.x +"," + b.y + ")");
+			  }  -->
+			  
+			  points.push(end);
+			  path.push(end);
+			  
+			  
+			  var clearPath = ListMap.static.newInstance();   
+			  var cargs = clearPath.instanceAdd("clearPrevPath");
+			  cargs.put("DriverID","[:$Macro.Argument.DriverID:]");
+			  addPaths.push(clearPath);
+			  
+			  for(s = points.length-1; s &gt;= 0; s--){ 
+				var a = points[s];
+				sffLog.info("A(" + a.x +"," + a.y + ")");
+				var addPathItem = ListMap.static.newInstance();   
+				var args = addPathItem.instanceAdd("addDriverPath");
+				args.put("DriverID","[:$Macro.Argument.DriverID:]");
+				args.put("Position",s);
+				args.put("Lat",a.x);
+				args.put("Lon",a.y);
+				if(s != points.length-1) {
+					var b = points[s+1];
+					distToEnd = distToEnd + Math.sqrt((b.x-a.x)*(b.x-a.x)+(b.y-a.y)*(b.y-a.y));
+				}
+				args.put("DistanceFromDest",distToEnd);
+				addPaths.push(addPathItem);
+				sffLog.info("addPathItem: " + addPathItem);
+			  }
+			  var response = "";
+			  for(i = 0; i &lt; addPaths.length; i++) {
+				response = response + addPaths[i];
+			  }
+			  <!-- return {points:points, path:path}; -->
+			  return response;
+			}
+			
+			function snap(point)
+			{
+			  var deltaX = parseInt(point.x % gridSize.x);
+			  var deltaY = parseInt(point.y % gridSize.y);
+				
+				var gx =  parseInt(gridSize.x);
+				var gy =  parseInt(gridSize.y);
+				sffLog.info("gx pre: " + (gx));
+				sffLog.info("gy pre: " + (gy));
+				sffLog.info("deltaX pre: " + deltaX);
+				sffLog.info("deltaY pre: " + deltaY);
+				gx = (gx-parseInt(deltaX));
+				gy = (gy-parseInt(deltaY));
+				sffLog.info("gx: " + gx);
+				sffLog.info("gx: " + gy);
+				sffLog.info("deltaX: " + deltaX);
+				sffLog.info("deltaY: " + deltaY);
+			<!--   deltaX = deltaX &gt; gridSize.x/2 ? gx : -deltaX;
+			  deltaY = deltaY &gt; gridSize.y/2 ? gy : -deltaY; -->
+			  
+			  if(deltaX &gt; gridSize.x/2)
+				deltaX = gx;
+			  else
+				deltaX = -deltaX;
+				
+			if(deltaY &gt; gridSize.y/2)
+				deltaY = gy;
+			  else
+				deltaY = -deltaY;
+			  
+			   sffLog.info("ABS deltaX: " + deltaX);
+			  sffLog.info("ABS deltaY: " + deltaY);
+			  
+		    sffLog.info("deltaX: " + Math.abs(deltaX));
+			  sffLog.info("deltaY: " + Math.abs(deltaY));
+			  sffLog.info("Comp: " + Math.abs(deltaX) > Math.abs(deltaY));
+			  
+			  
+			if(Math.abs(deltaX) > Math.abs(deltaY)) {
+				sffLog.info("Insinf If");
+				point.y = parseInt(point.y) + parseInt(deltaY);
+			} else {
+				sffLog.info("Insinf else");
+				point.x = parseInt(point.x) + parseInt(deltaX);
+			}
+				
+			sffLog.info("SnapX: " + point.x);
+			  sffLog.info("SnapY: " + point.y);
+			}
+			
+			var st = {x:"[:$Macro.Argument.StartX:]", y:"[:$Macro.Argument.StartY:]"};
+			var en = {x:"[:$Macro.Argument.EndX:]", y:"[:$Macro.Argument.EndY:]"};
+			
+			var response = calcPath(st, en);
+			response;
+      </JavaScript>
+     
+      <SetResponse>
+        <Include>[:$Macro.Argument.PathDataLoc:]</Include>
+      </SetResponse>
+    </Result>
+  </Macro>

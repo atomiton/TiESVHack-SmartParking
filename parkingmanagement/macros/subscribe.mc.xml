@@ -1,0 +1,23 @@
+<Macro Name="SubscribeToTQL">
+	<Argument>
+		<TopicName>TQL.*</TopicName>
+		<TopicId>GenericTopicID</TopicId>
+		<ActionName/>
+	</Argument>
+	<Result>
+		<DoRequest target="[:RuntimeParams.TQLStudio_TopicFacetIDName:]">
+			<Process>
+				<Message type="xml">
+					<Value>
+						<Subscribe sid="[:$Macro.Argument.TopicId:]"
+							topic="[:$Macro.Argument.TopicName:]">
+							<Action>
+								[:$Macro.Argument.ActionName:]
+							</Action>
+						</Subscribe>
+					</Value>
+				</Message>
+			</Process>
+		</DoRequest>
+	</Result>
+</Macro>

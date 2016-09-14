@@ -1,0 +1,60 @@
+<Macro name="provideReservation">
+	<Argument>
+		<String name="DriverID"/>
+		<String name="SpotID"/>
+		<String name="LotID"/>
+		<String name="OperatorID"/>
+	</Argument>
+	<Result>
+		<checkReadWriteAccess>
+			<LotID>[:$Macro.Argument.LotID:]</LotID>
+			<OperatorID>[:$Macro.Argument.OperatorID:]</OperatorID>
+		</checkReadWriteAccess>
+		<If condition="/'[:$Response.Message.Value.Result.Access:]' eq 'true'">
+			<then>
+				<executeQuery>
+					<QueryString>
+						<Query>
+							<Find format="version">
+								<Driver>
+									<DriverID eq="[:$Macro.Argument.DriverID:]" />
+								</Driver>
+							</Find>
+						</Query>
+					</QueryString>
+				</executeQuery>
+				
+				<if condition="/'[:$Response.Message.Value.Find.Driver.Decision:]' eq 'false'">
+					<then>
+						<reverseBridge>
+							<BTCode>
+								<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.ReservedLotID" value="[:$Macro.Argument.LotID:]"/>
+							</BTCode>
+						</reverseBridge>
+						<reverseBridge>
+							<BTCode>
+								<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.LotID" value="[:$Macro.Argument.LotID:]"/>
+							</BTCode>
+						</reverseBridge>
+						<reverseBridge>
+							<BTCode>
+								<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.SpotID" value="[:$Macro.Argument.SpotID:]"/>
+							</BTCode>
+						</reverseBridge>
+						<reverseBridge>
+							<BTCode>
+								<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.DecisionMade" value="yes"/>
+							</BTCode>
+						</reverseBridge>
+						<SetResponseData key="Message.Value.Response.Status" value="Success" />
+						<SetResponseData key="Message.Value.Response.Message" value="Reservation Successful" />
+					</then>
+					<else>
+						<SetResponseData key="Message.Value.Response.Status" value="Failure" />
+						<SetResponseData key="Message.Value.Response.Message" value="Driver has already made reservation!" />
+					</else>
+				</if>
+				</then>
+		</If>
+	</Result>
+</Macro>

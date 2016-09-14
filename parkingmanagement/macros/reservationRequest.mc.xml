@@ -1,0 +1,61 @@
+<Macro name="reservationRequest">
+	<Argument>
+		<String name="DriverID"/>
+		<String name="LotID"/>
+		<String name="OperatorID"/>
+		<Boolean name="DriverResponse"/>
+		<Number name="Price"/>
+	</Argument>
+	<Result>
+		<Log Message="Driver Response:::::::: [:$Macro.Argument.DriverID:]=====> [:$Macro.Argument.DriverResponse:]"/>
+		<Log message="LastU: [:$ProcessData.LastU:]" />
+	
+		<Log message="LotID: [:$Macro.Argument.LotID:]" />
+		<Log message="OperatorID: [:$Macro.Argument.OperatorID:]" />
+		<Log message="Price: [:$Macro.Argument.Price:]" />
+		<SetProcessData>
+			<Key>DriverID</Key>
+			<Value>[:$Macro.Argument.DriverID:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>LotID</Key>
+			<Value>[:$Macro.Argument.LotID:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>OperatorID</Key>
+			<Value>[:$Macro.Argument.OperatorID:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>DriverResponse</Key>
+			<Value>[:$Macro.Argument.DriverResponse:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>Price</Key>
+			<Value>[:$Macro.Argument.Price:]</Value>
+		</SetProcessData>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<deleteAll>
+						<ReservationRequests>
+							<LotID eq="[:$ProcessData.LotID:]" />
+							<DriverID eq="[:$ProcessData.DriverID:]" />
+						</ReservationRequests>
+					</deleteAll>
+					<create>
+					    <ReservationRequests>
+					        <OperatorID>[:$ProcessData.OperatorID:]</OperatorID>
+					        <LotID>[:$ProcessData.LotID:]</LotID>
+					        <DriverID>[:$ProcessData.DriverID:]</DriverID>
+					        <SpotID></SpotID>
+					        <ReservationPrice>[:$ProcessData.Price:]</ReservationPrice>
+					    </ReservationRequests>
+					</create>
+					<Log Message="ReservationRequests LotID:::::::: =====> [:$ProcessData.LotID:]"/>
+					<Log Message="ReservationRequests DriverID:::::::: =====> [:$ProcessData.DriverID:]"/>
+					<Log Message="ReservationRequests Price:::::::: =====> [:$ProcessData.Price:]"/>
+				</Query>
+			</QueryString>
+		</executeQuery>
+	</Result>
+</Macro>

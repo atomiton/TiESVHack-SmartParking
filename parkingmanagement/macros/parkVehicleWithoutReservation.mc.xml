@@ -1,0 +1,150 @@
+<Macro name="parkVehicleWithoutReservation">
+	<Argument>
+		<DriverID></DriverID>
+		<SpotID></SpotID>
+		<DistanceCeiling></DistanceCeiling>
+		<PriceCeiling></PriceCeiling>
+		<ParkTime></ParkTime>
+		<ReservedLotID></ReservedLotID>
+		<DestLat></DestLat>
+		<DestLon></DestLon>
+		<OperatorID></OperatorID>
+	</Argument>
+	<Result>
+		<Log message="[:$Macro.Argument.DriverID:] parking at [:$Macro.Argument.SpotID:]" />
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="current">
+						<CityParkingApp>
+							<LotID eq="[:$Macro.Argument.ReservedLotID:]" />
+						</CityParkingApp>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<SetProcessData>
+			<Key>HourlyPrice</Key>
+			<Value>[:$Response.Message.Value.Find.Result.CityParkingApp.TodaysPrice:]</Value>
+		</SetProcessData>
+		<SetProcessData>
+			<Key>SelectOperator</Key>
+			<Value>[:$Response.Message.Value.Find.Result.CityParkingApp.OperatorID:]</Value>
+		</SetProcessData>
+	
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="current,version">
+						<ParkingLot>
+							<LotID eq="[:$Macro.Argument.ReservedLotID:]" />
+						</ParkingLot>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		
+		<JavaScript>
+			sffLog.info("DestLat: [:$Macro.Argument.DestLat:]");
+			sffLog.info("DestLon: [:$Macro.Argument.DestLon:]");
+			sffLog.info("LotLocation.Latitude: [:$Response.Message.Value.Find.Result.ParkingLot.LotLocation.Latitude.Value:]");
+			sffLog.info("LotLocation.Longitude: [:$Response.Message.Value.Find.Result.ParkingLot.LotLocation.Longitude.Value:]");
+			
+			var x1 = parseInt("[:$Macro.Argument.DestLat:]");
+			var y1 = parseInt("[:$Macro.Argument.DestLon:]");
+			var x2 = parseInt("[:$Response.Message.Value.Find.Result.ParkingLot.LotLocation.Latitude.Value:]");
+			var y2 = parseInt("[:$Response.Message.Value.Find.Result.ParkingLot.LotLocation.Longitude.Value:]");
+			
+			var d = Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+			sffContext.setProcessData("actualDist", d);
+			sffLog.info("actualDist: " + d);
+		</JavaScript>
+		
+		<calculateSatisfaction>
+			<HourlyPrice>[:$ProcessData.HourlyPrice:]</HourlyPrice>
+			<PriceCeiling>[:$Macro.Argument.PriceCeiling:]</PriceCeiling>
+			<ActualDistance>[:$ProcessData.actualDist:]</ActualDistance>
+			<DistanceCeiling>[:$Macro.Argument.DistanceCeiling:]</DistanceCeiling>
+		</calculateSatisfaction>
+		
+		<SetProcessData>
+			<Key>Satisfaction</Key>
+			<Value>[:$Response.Message.Value.Result.Satisfaction:]</Value>
+		</SetProcessData>
+		
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find format="current,version">
+						<ParkingSpot>
+							<SpotID eq="[:$Macro.Argument.SpotID:]" />
+						</ParkingSpot>
+					</Find>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.ParkingSpot.SpotStatus.Value</Key>
+						<Value>Full</Value>
+					</SetResponseData>
+					<SetResponseData>
+						<Key>Message.Value.Find.Result.ParkingSpot.HourToEmpty.Value</Key>
+						<Value>[:$Macro.Argument.ParkTime:]</Value>
+					</SetResponseData>					
+					<Update>
+						<from>Result</from>
+						<Include>$Response.Message.Value.Find</Include>
+					</Update>
+				</Query>
+			</QueryString>
+		</executeQuery>
+
+		<JavaScript>
+			var hourlyPrice = parseFloat("[:$ProcessData.HourlyPrice:]");
+			var parkTime = parseFloat("[:$Macro.Argument.ParkTime:]");
+
+			var parkingAmount = parseFloat( hourlyPrice * parkTime);
+			sffLog.info("parkingAmount==== :+parkingAmount");
+			sffContext.setProcessData("ParkingAmount", parkingAmount);
+
+		</JavaScript>
+		
+		<Log message="Calculated Satisfaction: [:$ProcessData.Satisfaction:]" />
+		<Log message="Updating Satisfaction for Operator: [:$ProcessData.SelectOperator:]" />
+		<Log message="Updating Satisfaction for Lot: [:$Macro.Argument.ReservedLotID:]" />
+		<calculateLoyaltyCredit>
+			<Satisfaction>[:$ProcessData.Satisfaction:]</Satisfaction>
+			<OperatorID>[:$ProcessData.SelectOperator:]</OperatorID>
+		</calculateLoyaltyCredit>
+		<calculateOperateAppValue>
+			<Satisfaction>[:$ProcessData.Satisfaction:]</Satisfaction>
+			<LotID>[:$Macro.Argument.ReservedLotID:]</LotID>
+		</calculateOperateAppValue>
+		<calculateOperatorAppRating>
+			<LotID>[:$Macro.Argument.ReservedLotID:]</LotID>
+		</calculateOperatorAppRating>
+		<Log message="Going to updateParkingLotOperatorRevenue Without" />
+		<updateParkingLotOperatorRevenue>
+			<Amount>[:$ProcessData.ParkingAmount:]</Amount>
+			<OperatorID>[:$ProcessData.SelectOperator:]</OperatorID>
+		</updateParkingLotOperatorRevenue>
+
+		<calculateLoyaltyCreditDriverOperator>
+			<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+			<OperatorID>[:$ProcessData.SelectOperator:]</OperatorID>
+			<LoyaltyCredit>[:$ProcessData.Satisfaction:]</LoyaltyCredit>
+		</calculateLoyaltyCreditDriverOperator>
+		
+		<If condition="/'[:$Macro.Argument.OperatorID:]' ne ''">
+			<then>
+				<If condition="/'[:$ProcessData.SelectOperator:]' ne '[:$Macro.Argument.OperatorID:]'">
+					<then>
+						<calculateLoyaltyCreditDriverOperator>
+							<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+							<OperatorID>[:$Macro.Argument.OperatorID:]</OperatorID>
+							<LoyaltyCredit>[:$ProcessData.Satisfaction:]</LoyaltyCredit>
+						</calculateLoyaltyCreditDriverOperator>
+					</then>
+				</If>
+			</then>
+		</If>
+		
+	</Result>
+</Macro>

@@ -1,0 +1,323 @@
+<NewPackage>
+	<RuntimeParams>
+		<DbmLocation>parkingmanagement/models/parkingmanagement.dbm.xml
+		</DbmLocation>
+		<ThingFacetLocation>parkingmanagement/facets/</ThingFacetLocation>
+		<TypesLocation>parkingmanagement/types/</TypesLocation>
+		<MacroLocation>parkingmanagement/macros/</MacroLocation>
+		<SpacesLocation>parkingmanagement/spaces/</SpacesLocation>
+		<TQLStudio_WSFacetIDName>parkingmanagementws</TQLStudio_WSFacetIDName>
+		<TQLStudio_FacetIDName>parkingmanagement</TQLStudio_FacetIDName>
+		<TQLStudio_SequenceFacetIDName>parkingmanagementseq</TQLStudio_SequenceFacetIDName>
+		<TQLStudio_TopicFacetIDName>TQLGenericTopic</TQLStudio_TopicFacetIDName>
+		<TQLStudio_TQLCacheName>parkingmanagement</TQLStudio_TQLCacheName>
+		<TQLStudio_SFFStorage>jdbc://</TQLStudio_SFFStorage>
+		 <TQLStudio_MacroFacetID>parkingmanagementmacros</TQLStudio_MacroFacetID>
+		 <TQLStudio_BdlFacetIDName>parkingmanagementbdl</TQLStudio_BdlFacetIDName>
+		 <TQLStudio_BdlFacetIDName1>parkingmanagementbdl1</TQLStudio_BdlFacetIDName1>
+		
+		<CONSTANT_A>2</CONSTANT_A>
+		<CONSTANT_B>3</CONSTANT_B>
+		<CONSTANT_C>4</CONSTANT_C>
+		<CONSTANT_D>5</CONSTANT_D>
+		<CONSTANT_E>6</CONSTANT_E>
+		<Max_Range>1</Max_Range>
+		<Decision_Threshold>500</Decision_Threshold>
+		<InRange_Threshold>65</InRange_Threshold>
+
+		
+		<GRID_X>10</GRID_X>
+		<GRID_Y>10</GRID_Y>
+	</RuntimeParams>
+	<RESTHeaders>
+		<Headers>
+			<Connection>close</Connection>
+			<Access-Control-Allow-Origin>*</Access-Control-Allow-Origin>
+			<Access-Control-Allow-Methods>GET, POST, PUT
+			</Access-Control-Allow-Methods>
+			<Access-Control-Allow-Headers>Content-Type,
+				X-Atomiton-Studio-Key,X-Atomiton-Session-Key
+			</Access-Control-Allow-Headers>
+		</Headers>
+	</RESTHeaders>
+	<GenerateMessage>
+		<Message>
+			<Value>
+				<Include>[:@RT:]GenMsgArgs</Include>
+			</Value>
+		</Message>
+	</GenerateMessage>
+	
+	<NewFacetInstance fid="[:RuntimeParams.TQLStudio_MacroFacetID:]"
+                      name="ProjectMacros" type="SffTcpFacet">
+		<OnActivate>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]executeQuery.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]loadData.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]addDriver.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]addParkingLot.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]calculateUtilityValue.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]calculateSatisfaction.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]getMaximumNumber.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]VirtualClockTicker.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]addScheduleJob.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]DeleteScheduleJob.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]reverseBridge.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]driverInitBT.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]getDriversInRange.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]parkingLotInitBT.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]addDriverDestination.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]selectRandomDestination.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]generateRandomInt.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]setDriverTravelInfoAll.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]setDriverTravelInfo.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]offerReservationAll.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]offerReservation.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]calculateDistance.mc.xml</Include></Macro>			
+			<Macro><Include>[:RuntimeParams.MacroLocation:]subscribe.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]saveParkingLotInfo.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]updateCityParkingApp.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]scheduleCityParkingAppUpdate.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]calcPath.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]saveOperatorAppInfo.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]calculateDriverDecisionRange.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]updateParkingLotSpotStatus.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]reservationRequest.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]addDriverPath.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]clearPrevPath.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]moveDriver.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]addParkingSpot.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]createParkingSpot.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]parkVehicle.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]provideReservation.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]calculateLoyaltyCredit.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]calculateOperateAppValue.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]calculateOperatorAppRating.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]updateRegisteredVacancy.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]reserveParkingSpot.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]createOperator.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]reduceParkedTime.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]UpdateParkedTime.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]searchForParkingInDecisionRangeAll.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]searchForParkingInDecisionRange.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]makeReservation.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]assignParkingLot.mc.xml</Include></Macro>
+            <Macro><Include>[:RuntimeParams.MacroLocation:]shareParkingLot.mc.xml</Include></Macro>
+            <Macro><Include>[:RuntimeParams.MacroLocation:]removeParkingLotSharing.mc.xml</Include></Macro>
+            <Macro><Include>[:RuntimeParams.MacroLocation:]removeParkingLot.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]checkParkingLotNearby.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]getSpotForReservation.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]decideOperatorApp.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]calculateLoyaltyCreditDriverOperator.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]createDriverOperator.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]updateParkingLotOperatorRevenue.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]createDriverTravelInfo.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]updatePriceByParkingLotOperator.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]updatePriceForAllApps.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]updateCityParkingAppPrice.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]updateOperatorAppPrice.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]updateCityParkingAppVacancies.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]updateOperatorAppVacancies.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]sendPrivateInfoToDriver.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]calculateCoordDistance.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]offerReservationCPAAll.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]offerReservationVisualRange.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]checkInVisualRange.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]getLotsSortedByDist.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]findNearestFreeParking.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]parkVehicleWithoutReservation.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]setDecisionMade.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]offerReservationChkAndAssign.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]checkReadWriteAccess.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]checkReadAccess.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]updateDriverDecision.mc.xml</Include></Macro>
+			<Macro><Include>[:RuntimeParams.MacroLocation:]generateRandomFloat.mc.xml</Include></Macro>
+		</OnActivate>
+	</NewFacetInstance>
+	
+	<NewFacetInstance fid="[:RuntimeParams.TQLStudio_TopicFacetIDName:]"
+		name="TQLGenericTopic" type="SffTopicFacet">
+		<OnActivate>
+			<DoRequest>
+				<Process Return="CMD_NOP">
+					<Message type="xml">
+						<Value>
+							<Subscribe sid="GenericTopicID" topic="TQL.*">
+								<Action>
+									<!-- <Log>CacheUpdate -> [:[:@Log:]$Request:]</Log> -->
+								</Action>
+							</Subscribe>
+						</Value>
+					</Message>
+				</Process>
+			</DoRequest>
+		</OnActivate>
+		<OnOpen ModifyPipeline="HttpServerExtensionArgs" />
+	</NewFacetInstance>
+
+	<NewFacetInstance fid="[:RuntimeParams.TQLStudio_SequenceFacetIDName:]"
+		name="seq" type="SffSequenceFacet">
+		<OnActivate>
+		</OnActivate>
+		<OnOpen ModifyPipeline="HttpServerExtensionArgs" />
+	</NewFacetInstance>
+
+	<NewFacetInstance fid="[:RuntimeParams.TQLStudio_WSFacetIDName:]"
+		Name="TQL" Type="SffTqlFacet">
+		<OnActivate>
+			<NewFacetInstance name="tqlwfws" type="SffWdlFacet" />
+			<TopicFacet>?TQLGenericTopic</TopicFacet>
+			<Process Return="CMD_NOP">
+				<Storage Name="[:RuntimeParams.TQLStudio_TQLCacheName:]"
+					Type="SqlSff"
+					Comment="[:RuntimeParams.TQLStudio_TQLCacheName:] Database SFF Unstructured SQL database" />
+				<Namespace>
+					<Include>
+						[:RuntimeParams.DbmLocation:]
+					</Include>
+				</Namespace>
+			</Process>
+		</OnActivate>
+		<OnOpen ModifyPipeline="WsServerExtensionArgs" />
+		<OnRequest>
+			<DoRequest>
+				<Process Return="CMD_NOP">
+					<Message>
+						<Value>
+							<Include>$Request.Message.Value</Include>
+						</Value>
+					</Message>
+				</Process>
+			</DoRequest>
+			<DoResponse>
+				<Process Return="CMD_NOP">
+					<GenMsgArgs>
+						<Include>$Response.Message.Value</Include>
+					</GenMsgArgs>
+					<Include>GenerateMessage</Include>
+				</Process>
+			</DoResponse>
+		</OnRequest>
+	</NewFacetInstance>
+
+
+	<NewFacetInstance fid="[:RuntimeParams.TQLStudio_FacetIDName:]"
+		Name="TQL" Type="SffTqlFacet">
+		<OnActivate>
+			<!-- <Log>[]</Log> -->
+			<NewFacetInstance name="tqlwf" type="SffWdlFacet" />
+			<TopicFacet>?TQLGenericTopic</TopicFacet>
+			<ImportFacet>[:RuntimeParams.TQLStudio_MacroFacetID:]</ImportFacet>
+			<Process Return="CMD_NOP">
+				<Storage Name="[:RuntimeParams.TQLStudio_TQLCacheName:]"
+					Type="SqlSff"
+					Comment="[:RuntimeParams.TQLStudio_TQLCacheName:] Database SFF Unstructured SQL database" />
+				<Namespace>
+					<Include>
+						[:RuntimeParams.DbmLocation:]
+					</Include>
+				</Namespace>
+			</Process>
+		</OnActivate>
+		<OnOpen ModifyPipeline="HttpServerExtensionArgs" />
+		<OnRequest>
+			<DoRequest>
+				<Process Return="CMD_NOP">
+					<Message>
+						<Value>
+							<Include>$Request.Message.Value</Include>
+						</Value>
+					</Message>
+				</Process>
+			</DoRequest>
+			<DoResponse>
+				<Process Return="CMD_NOP">
+					<Include>RESTHeaders</Include>
+					<GenMsgArgs>
+						<Include>$Response.Message.Value</Include>
+					</GenMsgArgs>
+					<Include>GenerateMessage</Include>
+				</Process>
+			</DoResponse>
+		</OnRequest>
+	</NewFacetInstance>
+
+	<NewFacetInstance fid="[:RuntimeParams.TQLStudio_FacetIDName:]"
+		Name="TQL" Type="SffTqlFacet">
+		<OnActivate>
+			<Log>[]</Log>
+			<NewFacetInstance name="tqlwf" type="SffWdlFacet" />
+			<TopicFacet>?TQLGenericTopic</TopicFacet>
+            <ImportFacet>[:RuntimeParams.TQLStudio_MacroFacetID:]</ImportFacet>
+            <Macro><Include>[:RuntimeParams.MacroLocation:]BTFSInvoke.mc.xml</Include></Macro>
+			<Process>
+				<Storage Name="[:RuntimeParams.TQLStudio_TQLCacheName:]"
+					Type="SqlSff"
+					Comment="[:RuntimeParams.TQLStudio_TQLCacheName:] Database SFF Unstructured SQL database" />
+				<Namespace>
+					<Include>
+						[:RuntimeParams.DbmLocation:]
+					</Include>
+				</Namespace>
+			</Process>
+		</OnActivate>
+		<OnOpen ModifyPipeline="HttpServerExtensionArgs" />
+		<OnRequest>
+              <Process Return="CMD_NOP">
+                    <Message>
+						<Value>
+                            <Include>$Request.Message.Value</Include>
+						</Value>
+					</Message>
+				</Process>
+			<DoResponse>
+				<Process>
+					<Include>RESTHeaders</Include>
+					<GenMsgArgs>
+						<Include>$Response.Message.Value</Include>
+					</GenMsgArgs>
+					<Include>GenerateMessage</Include>
+				</Process>
+			</DoResponse>
+		</OnRequest>
+	</NewFacetInstance>
+	
+	<NewFacetInstance fid="[:RuntimeParams.TQLStudio_BdlFacetIDName:]" name="bdl1" type="SffBdlFacet">
+      <OnOpen ModifyPipeline="HttpServerExtensionArgs" />
+    </NewFacetInstance>
+	
+	<NewFacetInstance fid="[:RuntimeParams.TQLStudio_BdlFacetIDName1:]" name="bdl2" type="SffBdlFacet">
+       <OnActivate>
+        <OnRequest>
+            <DoRequest>
+            <Process Return="CMD_NOP">
+                <Message Type="XML">
+                    <Value>
+                        <Workflow wid="BTToTQLWorkflow" Limit="1" Live="1" Timeout="0">
+                            <Namespace name="BTTQLBridge">
+                                <Task name="ExecuteDirectQuery" while="true">
+                                    <Event name="Argument" as="ActionArgument" />
+                                    <Invoke name="postTQL"  waitFor="Argument">
+                                        <FacetScript>
+                                            <DoRequest target="[:RuntimeParams.TQLStudio_FacetIDName:]" Disable="CMD_SERVER">
+                                                 <Process Return="CMD_NOP">
+                                                    <Message>
+                                                        <Value>
+                                                            <Include>[%:@WFRT:%]Event.Argument</Include>
+                                                        </Value>
+                                                    </Message>
+                                                </Process>
+                                           </DoRequest>
+                                        </FacetScript>
+                                    </Invoke>
+                                </Task>
+                            </Namespace>
+                        </Workflow>
+                    </Value>
+                </Message>
+            </Process>
+            </DoRequest>
+        </OnRequest>
+    </OnActivate>
+      <OnOpen ModifyPipeline="HttpServerExtensionArgs"/>
+    </NewFacetInstance>
+</NewPackage>

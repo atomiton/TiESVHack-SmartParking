@@ -1,0 +1,32 @@
+<Macro name="updatePriceForAllApps">
+	<Argument/>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>	
+					<Find format="current,version">
+						<ParkingLotOperator>
+							<ID ne="" />
+						</ParkingLotOperator>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<For each="operator" in="Find.Result.ParkingLotOperator" using="$ProcessData" >
+			<updateCityParkingAppPrice>
+				<OperatorID>[:$ProcessData.operator.OperatorID.Value:]</OperatorID>
+				<LotID1>[:$ProcessData.operator.LotID1.Value:]</LotID1>
+				<LotID2>[:$ProcessData.operator.LotID2.Value:]</LotID2>
+				<LotOnePrice>[:$ProcessData.operator.LotOnePrice.Value:]</LotOnePrice>
+				<LotTwoPrice>[:$ProcessData.operator.LotTwoPrice.Value:]</LotTwoPrice>
+			</updateCityParkingAppPrice>
+			<updateOperatorAppPrice>
+				<OperatorID>[:$ProcessData.operator.OperatorID.Value:]</OperatorID>
+				<LotID1>[:$ProcessData.operator.LotID1.Value:]</LotID1>
+				<LotID2>[:$ProcessData.operator.LotID2.Value:]</LotID2>
+				<LotOnePrice>[:$ProcessData.operator.LotOnePrice.Value:]</LotOnePrice>
+				<LotTwoPrice>[:$ProcessData.operator.LotTwoPrice.Value:]</LotTwoPrice>
+			</updateOperatorAppPrice>
+		</For>
+	</Result>
+</Macro>

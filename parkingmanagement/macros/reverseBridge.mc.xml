@@ -1,0 +1,18 @@
+<Macro name="reverseBridge">
+	<Argument>
+		<BTCode/>
+	</Argument>
+	<Result>	
+		<DoRequest target="[:RuntimeParams.TQLStudio_BdlFacetIDName1:]" Disable="CMD_SERVER">
+			<Process>
+				<Message>
+					<Value>
+                        <Include>
+						  $Macro.Argument.BTCode
+                        </Include>
+					</Value>
+				</Message>
+			</Process>
+		</DoRequest>
+	</Result>
+</Macro>

@@ -1,0 +1,16 @@
+<Query>
+    <Find>
+        <ParkingLot>
+            <ParkingLotId>
+                <ne></ne>
+            </ParkingLotId>
+        </ParkingLot>
+    </Find>
+    <SetResponseData>
+        <key>Message.Value. ParkingLot.Count</key>
+        <value>[:$Response.Message.Value.Find/count(Result):]</value>
+    </SetResponseData>
+    <DelResponseData>
+        <key>Message.Value.Find</key>
+    </DelResponseData>
+</Query>

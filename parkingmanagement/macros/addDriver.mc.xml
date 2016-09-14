@@ -1,0 +1,32 @@
+<Macro Name="addDriver">
+	<Argument>
+		<String name="DriverID"/>
+		<Number name="HomeLatitude"/>
+		<Number name="HomeLongitude"/>
+		<!-- <Number name="DestinationLatitude"/>
+		<Number name="DestinationLongitude"/> -->
+	</Argument>
+	<Result>
+		<Log Message="Saving Driver Info..." />
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Save>
+						<Driver>
+							<DriverId>[:$Macro.Argument.DriverID:]</DriverId>
+							<HomeAddress/>
+							<Decision>false</Decision>
+							<ParkedLotID/>
+							<LastUtilityFunction>0.1</LastUtilityFunction>
+							<TimeParked />
+							<HomeLocation>
+								<Latitude>[:$Macro.Argument.HomeLatitude:]</Latitude>
+								<Longitude>[:$Macro.Argument.HomeLongitude:]</Longitude>
+							</HomeLocation>
+						</Driver>
+					</Save>
+				</Query>
+			</QueryString>
+		</executeQuery>
+	</Result>
+</Macro>

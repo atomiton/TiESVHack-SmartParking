@@ -1,0 +1,9 @@
+<Query>
+    <Find>
+        <ParkingLot>
+            <ParkingLotId>
+                <ne></ne>
+            </ParkingLotId>
+        </ParkingLot>
+    </Find>
+</Query>

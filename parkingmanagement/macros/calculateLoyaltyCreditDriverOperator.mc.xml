@@ -1,0 +1,63 @@
+<Macro name="calculateLoyaltyCreditDriverOperator">
+	<Argument>
+		<String name="DriverID"/>
+		<String name="OperatorID"/>
+		<Number name="LoyaltyCredit"/>
+	</Argument>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<find format="current,version">
+   						<DriverOperator>
+     						<OperatorID eq="[:$Macro.Argument.OperatorID:]"/>
+     						<DriverID eq="[:$Macro.Argument.DriverID:]"/>
+						</DriverOperator>
+					</find>
+					<Log Message="[:$Response.Message.Value.Find/count(Result):]"/>
+
+					<if condition="/[:$Response.Message.Value.Find/count(Result):] gt 0">
+						<then>
+							
+							<SetProcessData>
+								<Key>LoyaltyCreditsDriverOperator</Key>
+								<Value>[:$Response.Message.Value.Find.Result.DriverOperator.LoyaltyCredit.Value:]</Value>
+							</SetProcessData>
+
+							<JavaScript>
+									var loyaltycredit = 0;
+									var loyaltycredit =  parseFloat("[:$Macro.Argument.LoyaltyCredit:]");
+									if("[:$ProcessData.LoyaltyCreditsDriverOperator:]" != '0E-10') {
+										loyaltyCreditDriverOperator = parseFloat("[:$ProcessData.LoyaltyCreditsDriverOperator:]");
+									}
+								
+									var loyaltycredit = loyaltyCreditDriverOperator + loyaltycredit ;
+									sffLog.info("loyaltycredit  ======" + loyaltycredit );
+									sffContext.setLocalData("Loyaltycredit",loyaltycredit);
+							</JavaScript>
+							<SetResponseData>
+								<Key>Message.Value.Find.Result.DriverOperator.LoyaltyCredit.Value</Key>
+								<Value>[:$LocalData.Loyaltycredit:]</Value>
+							</SetResponseData>
+							<Update>
+								<from>Result</from>
+								<Include>$Response.Message.Value.Find</Include>
+							</Update>	
+
+					 </then>
+
+					 <else>
+						<createDriverOperator>
+							<DriverID>[:$Macro.Argument.DriverID:]</DriverID>
+							<OperatorID>[:$Macro.Argument.OperatorID:]</OperatorID>
+							<LoyaltyCredit>[:$Macro.Argument.LoyaltyCredit:]</LoyaltyCredit>
+						</createDriverOperator>
+
+					</else> 
+				</if>
+				</Query>
+			</QueryString>
+	   </executeQuery>
+		
+	</Result>
+</Macro>

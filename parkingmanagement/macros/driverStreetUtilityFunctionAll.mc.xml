@@ -1,0 +1,23 @@
+<Macro name="driverStreetUtilityFunctionAll">
+	<Argument>
+		<String name="driverId" />
+	</Argument>
+	<Result>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<Find>
+						<Driver>
+							<Id eq="" />
+						</Driver>
+					</Find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+		<For each="res" in="Find.Result.Driver" using="$ProcessData" >
+			<driverStreetUtilityFunctionIndv>
+				<id>[:$ProcessData.res.Driver.Id:]</id>	
+			</driverStreetUtilityFunctionIndv>			
+		</For>
+	</Result>
+</Macro>

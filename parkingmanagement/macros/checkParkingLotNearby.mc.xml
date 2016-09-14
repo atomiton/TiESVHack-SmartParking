@@ -1,0 +1,137 @@
+<Macro name="checkParkingLotNearby">
+	<Argument>
+		<Number name="CurrLat"/>
+		<Number name="CurrLon"/>
+		<String name="DriverID"/>
+	</Argument>
+	<Result>
+		<Log Message="********starting checkParkingLotNearby******** "/>
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<find>
+						<ParkingLot>
+							<ID ne=""/>
+						</ParkingLot>
+					</find>
+					
+					<Log Message="******* inside for loop******** "/>
+				</Query>
+
+			</QueryString>
+		</executeQuery>
+
+		<JavaScript>
+
+			function DriverClass(lotID, distance) {
+				this.lotID = lotID;
+				this.distance = parseFloat(distance);
+			}
+
+			var ResultSet = sffContext.getResponse().Message.Value;
+			var creds = [];
+			var found= false;
+
+			for each(var result in ResultSet.Find) {
+				if(typeof(result) == 'object') {
+
+					sffLog.info("lotLatitude: " + result.ParkingLot.LotLocation.Latitude);
+					sffLog.info("lotLongitude: " + result.ParkingLot.LotLocation.Longitude);
+					sffLog.info("currLat: [:$Macro.Argument.CurrLat:]");
+					sffLog.info("currLong: [:$Macro.Argument.CurrLat:]");
+
+					var lotLatitude = parseFloat(result.ParkingLot.LotLocation.Latitude);
+					var lotLongitude = parseFloat(result.ParkingLot.LotLocation.Longitude);
+					var currLat = parseFloat("[:$Macro.Argument.CurrLat:]");
+					var currLong = parseFloat("[:$Macro.Argument.CurrLon:]");
+
+					sffLog.info("lotLatitude: " + lotLatitude);
+					sffLog.info("lotLongitude: " + lotLongitude);
+					sffLog.info("currLat: " + currLat);
+					sffLog.info("currLong: " + currLong);
+
+
+					var distance = parseFloat(Math.sqrt((lotLatitude - currLat)*(lotLatitude - currLat) + (lotLongitude -currLong) * (lotLongitude - currLong)) ) ;
+
+					if(distance.isNaN())
+					{
+						distance = 99999;
+					}	
+
+					sffLog.info("LotID: " + result.ParkingLot.LotID);
+					sffLog.info("Distance: " + distance);
+
+					creds.push(new DriverClass(result.ParkingLot.LotID, distance));
+					sffLog.info("pushed to creds.....");
+				}
+			}
+
+			creds.sort(function (a,b){
+				return (a.distance - b.distance);
+			});
+
+			sffLog.info("creds.length: " + creds.length);
+	
+			for (var i=0 ; i &lt; creds.length ; i++ )
+			{
+				if(creds[i].distance &lt;= [:RuntimeParams.InRange_Threshold:])
+				{
+					found=true;
+					var lotID = creds[i].lotID;
+					sffContext.setLocalData("LotID",lotID );
+					var setContextData = ListMap.static.newInstance();   
+					var rc = setContextData.instanceAdd("getSpotForReservation");
+					rc.put("LotID",lotID);
+					rc.put("DriverID","[:$Macro.Argument.DriverID:]");
+					found = true;
+					sffLog.info(setContextData);
+					setContextData;
+					break; 
+				}
+			}
+			sffContext.setProcessData("found", found);			
+		</JavaScript>
+
+		<executeQuery>
+			<QueryString>
+				<Query>
+					<find>
+						<OperatorApp>
+							<LotID eq="[:$LocalData.LotID:]"/>
+						</OperatorApp>
+					</find>
+				</Query>
+			</QueryString>
+		</executeQuery>
+
+		<SetProcessData>
+			<Key>TodaysPrice</Key>
+			<Value>[:$Response.Message.Value.Find.Result.OperatorApp.TodaysPrice:]</Value>
+		</SetProcessData>
+
+		<SetResponseData>
+			<Key>Message.Value.Result.Candidate</Key>
+			<Value></Value>
+		</SetResponseData>
+		<SetResponseData>
+			<Key>Message.Value.Result.Candidate.DriverID</Key>
+			<Value>[:$Macro.Argument.DriverID:]</Value>
+		</SetResponseData>
+		<SetResponseData>
+			<Key>Message.Value.Result.Candidate.Price</Key>
+			<Value>[:$ProcessData.TodaysPrice:]</Value>
+		</SetResponseData>
+		<SetResponseData>
+			<Key>Message.Value.Result.Candidate.LotID</Key>
+			<Value>[:$LocalData.LotID:]</Value>
+		</SetResponseData>
+		<SetResponseData>
+			<Key>Message.Value.Result.Candidate.OperatorID</Key>
+			<Value>[:$Response.Message.Value.Find.Result.OperatorApp.OperatorID:]</Value>
+		</SetResponseData>
+		<SetResponseData>
+			<Key>Message.Value.Result.Found</Key>
+			<Value>[:$ProcessData.found:]</Value>
+		</SetResponseData>
+	</Result>
+</Macro>

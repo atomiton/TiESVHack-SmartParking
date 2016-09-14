@@ -1,0 +1,38 @@
+<Macro name="calculateDriverDecisionRange">
+	
+	<Argument>
+		<String name="DriverID"/>
+		<Number name="DistanceCeiling"/>
+		<Number name="DistToDest" />
+	</Argument>
+	<Result>
+			
+			<JavaScript>
+				<Log Message="*********Executing claculateDriverDecisionRange*****************"/>
+
+						var distanceCeiling = parseFloat("[:$Macro.Argument.DistanceCeiling:]");
+						var distance = parseFloat("[:$Macro.Argument.DistToDest:]");
+						var decisionThreshold = parseFloat("[:RuntimeParams.Decision_Threshold:]");
+
+						var range = Math.min(decisionThreshold, distanceCeiling);
+						sffLog.info(" range====================" + range); 
+
+						if(distance &lt;= range)
+						{
+							sffContext.setLocalData("isInRange","yes");
+						}else{
+							sffContext.setLocalData("isInRange","no");
+						}
+						
+			</JavaScript>
+			<Log message="Local Data inrange=================== [:$LocalData.isInRange:]" />
+			<reverseBridge>
+				<BTCode>
+					<Set wid="driver[:$Macro.Argument.DriverID:]" target="DriverBT.InDecisionRange" value="[:$LocalData.isInRange:]"/>
+				</BTCode>
+			</reverseBridge>	
+			
+			
+			<DelResponseData key="Message.Value.Find" />
+		</Result>
+</Macro>

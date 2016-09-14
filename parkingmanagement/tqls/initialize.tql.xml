@@ -1,0 +1,67 @@
+<!--Delete All-->
+<deleteAll>
+        <Driver>
+            <Id ne=""/>
+        </Driver>
+</deleteAll>
+
+<deleteAll>
+	<ParkingSpot>
+		<Id ne=""/>
+	</ParkingSpot>
+</deleteAll>
+
+<deleteAll>
+    <ParkingLot>
+        <Id ne=""/>
+    </ParkingLot>
+</deleteAll>
+
+<deleteAll>
+    <DriverDestination>
+        <ID ne=""/>
+    </DriverDestination>
+</deleteAll>
+
+<deleteAll>
+    <ReservationRequests>
+        <ID ne=""/>
+    </ReservationRequests>
+</deleteAll>
+
+<deleteAll>
+    <DriverOperator>
+        <ID ne=""/>
+    </DriverOperator>
+</deleteAll>
+
+<deleteAll>
+    <DriverTravelInfo>
+        <ID ne=""/>
+    </DriverTravelInfo>
+</deleteAll>
+
+<deleteAll>
+    <TempReservationRequest>
+        <ID ne=""/>
+    </TempReservationRequest>
+</deleteAll>
+
+<!--Load data from csv-->
+<LoadFromCSV>
+	<destModelName>Driver</destModelName>
+	<LocationName>D:\\Vikrant\\Automiton\\TQLSystemStudio-0909\\tqlsystemstudiorelease\\parkingmanagement\\spaces\\</LocationName>
+</LoadFromCSV>
+
+<LoadFromCSV>
+	<destModelName>ParkingLot</destModelName>
+	<LocationName>D:\\Vikrant\\Automiton\\TQLSystemStudio-0909\\tqlsystemstudiorelease\\parkingmanagement\\spaces\\</LocationName>
+</LoadFromCSV>
+
+<LoadFromCSV>
+ <destModelName>DriverDestination</destModelName>
+ <LocationName>D:\\Vikrant\\Automiton\\TQLSystemStudio-0909\\tqlsystemstudiorelease\\parkingmanagement\\spaces\\</LocationName>
+</LoadFromCSV>
+
+
+

@@ -1,0 +1,14 @@
+<Macro name="scheduleCityParkingAppUpdate">
+	<Argument>
+		<String name="LotID"/>
+	</Argument>
+	<Result>
+		<ScheduleJob>
+			<Name>[:$Macro.Argument.LotID:]Sch</Name>
+			<ScheduleInterval>5sec</ScheduleInterval>
+			<ActionCode>
+			<updateCityParkingApp/>
+			</ActionCode>
+		</ScheduleJob>
+	</Result>
+</Macro>
